@@ -1,0 +1,61 @@
+\documentclass[orivec]{llncs}
+
+\usepackage{graphicx,url,wrapfig,amsmath,amssymb}
+
+\usepackage[show]{ed} %for ednotes
+
+\usepackage{sembracket}
+\usepackage{mytikz}
+\usepackage{basics}
+%\usepackage[llncs]{theorems} %only for now so that the environments are defined; replace with nice package for this later
+\usepackage{local}
+
+\setcounter{tocdepth}{3}
+\usepackage[bookmarks,linkcolor=red,citecolor=blue,urlcolor=gray,colorlinks,breaklinks,bookmarksopen,bookmarksnumbered]{hyperref}
+
+\setlength{\hfuzz}{3pt}
+\hbadness=10001 %make box warning less strict
+
+\begin{document}
+\title{Structuring Theories with Implicit Morphisms}
+\author{Florian Rabe$^{1,2}$ \and Dennis M\"uller$^2$}
+\institute{LRI Paris \and FAU Erlangen-Nuremberg}
+\maketitle
+
+\begin{abstract}
+We introduce \emph{implicit} morphisms as a concept in formal systems based on theories and theory morphisms.
+The idea is that there may be at most one implicit morphism from a theory $S$ to a theory $T$, and if $S$-expressions are used in $T$ their semantics is obtained by automatically inserting the implicit morphism.
+The practical appeal of implicit morphisms is that they hit the sweet-spot of being extremely simple to understand and implement while significantly helping with structuring large collections of theories.
+\end{abstract}
+
+\input{wadtabstract}
+\bibliographystyle{alpha}
+\bibliography{../../../Program_Data/Latex/bib/rabe,../../../Program_Data/Latex/bib/systems,../../../Program_Data/Latex/bib/institutions,../../../Program_Data/Latex/bib/pub_rabe,../../../Program_Data/Latex/bib/historical}
+\end{document}
+
+\section{Introduction}
+\input{intro}
+
+\section{Theories and Theory Morphism}
+\input{mmt}
+
+\section{Inclusion Morphisms}\label{sec:include}
+\input{include}
+
+\section{Implicit Morphisms}
+\input{implicit}
+
+\section{Complex Theories and Morphisms}\label{sec:complex}
+\input{complex}
+
+\section{Related Work}
+\input{related}
+
+\section{Conclusion}
+\input{conc}
+
+
+\bibliographystyle{alpha}
+\bibliography{../../../Program_Data/Latex/bib/rabe,../../../Program_Data/Latex/bib/systems,../../../Program_Data/Latex/bib/institutions,../../../Program_Data/Latex/bib/pub_rabe,../../../Program_Data/Latex/bib/historical}
+
+\end{document}

@@ -1,0 +1,185 @@
+\subsection{Motivation}
+
+The motivation behind implicit morphisms is to generalize the benefits of include declarations even further.
+Sometimes an atomic morphism is conceptually similar to an inclusion: For example, we might want to declare $m:\cn{Division}\to\cn{Group}=\{\cn{divide} := \lambda x,y.x\circ y^{-1}, \;\ldots\}$ to show how division is ``included'' into the theory of groups.
+Other times we have to use structures because we need to duplicate declarations but we would still like to use them like includes.
+For example, we have to declare the theory of rings using two structures (for the commutative group and the monoid).
+But we still want a ring to be implicitly converted into, e.g., a commutative group.
+
+Our key idea is to use a commutative{\footnotemark} subdiagram of the \mmt diagram, which we call the \emph{implicit-diagram}.
+It contains all theories but only some of the morphisms -- the ones designated as \emph{implicit}.
+Because the implicit-diagram commutes, there can be at most one implicit morphism from $S$ to $T$ -- if this morphism is $M$, we write $\ipc{M}{S}{T}$.
+\footnotetext{A diagram commutes if for any two morphisms $M,M'\in\Mo{S}{T}$, we have $M\equiv M'$.}
+%Practically, this hasis a multi-graph whose nodes are the theories and whose edges are the atomic morphisms.
+%We can extend the correspondence by identifying all paths with the composition of all edges along the path.
+%Then concatenation of paths is just composition of morphisms, and the empty path from $T$ to itself is the identity morphism $\id{T}$.
+%(This is well-defined because composition is associative and identity is neutral.)
+%A diagram is commutative if any two paths between the same nodes are equal (with respect to $\equiv$), i.e., there is at most one morphism between any two nodes.
+
+The implicit-diagram generalizes the inclusion relation $\harr$.
+In particular, all identity and inclusion morphisms are implicit, and we recover $S\harr T$ as the special case $\ipc{\id{S}}{S}{T}$.
+Moreover, the relation ``exists $M$ such that $\ipc{M}{S}{T}$'' is also an order.
+
+Consequently, many of the advantages of inclusions carry over to implicit morphisms.
+\begin{compactitem}
+\item It is very easy to maintain the implicit-diagram, e.g., as a partial map that assigns to a pair of theories the implicit morphism between them (if any).
+\item We can generalize the visibility of identifiers: If $\ipc{M}{S}{T}$, we can use all $S$-identifiers in $T$ as if $S$ were included into $T$.
+Any $c\in\dom{S}$ is treated as a valid $T$-identifiers with definiens $M(c)$.
+\item We can still use canonical identifiers $s?n$. Because there can be at most one implicit morphism $\ipc{M}{s}{T}$, using $s?n$ as an identifier in $T$ is unambiguous.
+Crucially, we can use $s?n$ without bothering what $M$ is.
+\end{compactitem}
+
+%Thus the main question arises what other morphisms we should make implicit.
+
+\subsection{Definition}
+
+\paragraph{Syntax}
+We have already indicated that we will consider all identities and inclusions as implicit.
+It remains to give users the option introduce additional implicit morphisms.
+For that purpose, we allow two \mmt declarations to carry an attribute: 
+\begin{grammar}
+MDec   & Att\; m:T\to T=\{Ass,\ldots,Ass\}   & \text{attributed atomic morphism} \\
+Dec    & Att\; \icl{S}                       & \text{attributed inclusion}\\
+Att    & \keyword{implicit} \alt \keyword{invertible} & \text{attributes}
+\end{grammar}
+
+Every morphism with the attribute \keyword{implicit} occurs in the implicit-diagram.
+(Of course, this is redundant for includes.)
+Every morphism with the attribute \keyword{invertible} is also considered implicit, and additionally so is its inverse morphism.
+
+We do not even have to provide a name for the inverse morphism: It is uniquely determined (up to $\equiv$) anyway, and it will be used only implicitly.
+We only have to make sure that the inverse actually exists and that it can be found automatically.
+This is not decidable in general, but it is decidable in many important special cases, in particular, renamings and definitional extensions.
+
+\paragraph{Semantics}
+Well-formedness and semantics are defined in parallel.
+
+\begin{definition}[Implicit-Diagram]
+Given a diagram $D$, its implicit-diagram $D^i$ contains all theories and the following morphisms:
+\begin{compactitem}
+\item all identities and inclusions,
+\item all compositions of implicit morphisms,
+\item every morphism with the \keyword{implicit} attribute,
+\item for each morphism with the \keyword{invertible} attribute, that morphism and its inverse. 
+\end{compactitem}
+\end{definition} 
+
+The only requirement for well-formedness is that the implicit-diagram always commutes.
+However, in general, commutativity may be undecidable.
+Similarly, the existence of an inverse morphism may be undecidable.
+Therefore, we use sound criteria for commutativity and invertibility as defined in Sect.~\ref{sec:commute} and \ref{sec:inverse}.
+
+\begin{definition}[Well-Formedness]
+Consider a well-formed diagram $D, m:S\to T=\{\sigma\}$.
+Let $D^a$ be $D, a\; m:S\to T=\{\sigma\}$.
+$D^{\keyword{implicit}}$ is well-formed if $D^i$ extended with an edge for $m$ commutes.
+$D^{\keyword{invertible}}$ is well-formed if $D^i$ extended with edges for $m$ and its inverse commutes.
+
+Correspondingly, consider a well-formed diagram $D$ of the form $D_0, T=\{\ldots,\icl{S},\ldots\}$.
+Let $D^a$ be $D_0, T=\{\ldots, a\; \icl{S},\ldots\}$.
+$D^{\keyword{invertible}}$ is well-formed if the inclusion has an *inverse.
+\end{definition}
+
+Finally, we modify the definition of $\Exp{T}$ and $M(-)$ to add all implicitly imported identifiers:
+
+\begin{definition}[Visible Declarations]
+The set $\flti{T}$ contains the following declarations:
+for every $\ipc{M}{S}{T}$ and every $c[:t][=d]$ in $\flt{S}$, the declaration $c[:M(t)]=M(c)$.
+
+The set $\Expi{T}$ contains all objects formed from the symbols in $\flti{T}$.
+The map $M(-)$ maps every $c$ for which $\flt{M}$ does not provide an assignment to $M(d)$ where $d$ is the definiens of $c$.
+\end{definition}
+
+This modification is conservative in the sense that $\flt{T}\sq\flti{T}$ and $\flti{T}\sm\flt{T}$ contains only declarations with definiens.
+Moreover, $\Exp{T}\sq\Expi{T}$ and $M(-)$ remains unchanged on all $o\in\Exp{T}$.
+It is easy to see that $M(-)$ still preserve all judgments.
+
+\subsection{Commutativity}\label{sec:commute}
+
+To prove commutativity, we have to find all paths in the implicit-diagram and check $M\equiv M'$ for all pairs of morphisms between the same nodes.
+
+\mmt reduces $M\equiv M'$ for $M,M'\in\Mo{S}{T}$ to a first-order problem in the theory of categories, which uses the following axioms:
+\begin{compactitem}
+\item associativity of composition,
+\item neutrality of identity,
+\item $M;M'\equiv \id{S}$ as well as $M';M\equiv\id{T}$ if $M\in\Mo{S}{T}$ and $M'$ is the known *inverse of $M$,
+\item if an atomic morphism $m$ includes $M\in\Mo{R}{T}$, then $M|_R\equiv M$.
+\end{compactitem}
+
+This is a sound but not complete axiomatization of $M\equiv M'$.
+We can obtain a complete axiomatization in a totally different way: Check $\der_T M(c)\equiv M'(c)$ for all $c\in\dom{S}$.
+However, this can be extremely expensive: It requires computing $\dom{S}$ and proving an object level equality for each identifier.
+Even if the equality of objects is decidable, this is often too expensive.
+
+In fact, because implicit morphisms are meant to be used in very particular cases, we expect the above incomplete calculus to perform reasonably well in practice.
+If showing the equality of certain morphisms is hard, one should probably not make them implicit in the first place.
+
+
+\subsection{Inverse Morphisms}\label{sec:inverse}
+
+We only two use sufficient criteria to determine an *inverse of a morphism $M$.
+
+\paragraph{Conservative Extensions}
+Intuitively, $t$ extends $S$ definitionally, if it only adds defined symbols, e.g., abbreviations or theorems.
+That is the most important case of conservative extensions.
+
+\begin{definition}[Definitional Extension]
+An include declaration \[t=\{\keyword{invertible}\;\icl{S},\Sigma\}\] is \textbf{definitional} if
+\begin{compactitem}
+ \item all symbol declarations in $\Sigma$ have a definiens,
+ \item all include declarations $\icl{R}$ in $\Sigma$ are such that $R$ also definitionally includes $S$.
+\end{compactitem}
+\end{definition}
+
+There are multiple, subtly different definitions of conservative extension.
+However, definitional extensions as defined above are always conservative (i.e., for any reasonable definition of conservativity and in any reasonable formal language).
+In fact, they are always invertible: The inverse morphism $i:t\to S$ maps
+\begin{compactitem}
+ \item an identifier $c\in\dom{S}$ to $c$ and everythemselves and the others to their definiens,
+ \item any other identifier, which must have a definiens $d$, to $i(d)$.
+\end{compactitem}
+
+%We use two auxiliary definitions.
+%Given $u:T\to U$, we write $u|_S$ for the restriction of $u$ to $S$, i.e., the composition of the inclusion $S\harr T$ and $u$.
+%An extension $S\to T$ is retractable if there is a morphism $r:T\to S$ such that $r|_S=\id{S}$.
+%
+%Whether a given extension $S\harr T$ is conservative depends on the specific definition of conservativity and the used logic.
+%However, the most important kind of conservative extension is very easy to handle: the extension of a theory with a defined constant (e.g., an abbreviation or a theorem).
+%These extensions are always conservative (i.e., for any reasonable definition of conservativity and in any reasonable logic).
+%In fact, they are always isomorphic to the original theory.
+%
+%Extensions with definition are almost exclusively used to add something to $S$.
+%Therefore, it is reasonable to automatically designate the retraction as implicit.
+%In particular, this provides an elegant way to add theorems to $S$ in such a way that they are available to any theory importing $S$, but without actually changing $S$.
+%
+%More generally, any retractable extension $S\harr T$ is always conservative.
+%But if the retraction usually does not exist uniquely (Often an arbitrary non-canonical choice is needed, e.g., any type.), this is not enough to make the retraction implicit.
+
+\paragraph{Renamings}
+Intuitively, an atomic morphism $m:S\to T$ is a renaming if it maps all $S$-identifiers to $T$-identifiers (rather than $T$-objects).
+
+\begin{definition}[Renaming]
+Consider a morphism $M\in\Mo{S}{T}$.
+Let $A\sq\dom{S}$ and $B\sq\dom{T}$ contain those identifiers without definiens.
+$M$ is an (injective, surjective) \textbf{renaming} if the restriction of $M(-)$ is an (injective, surjective) mapping $A\to B$.
+\end{definition}
+
+Clearly, if $m$ is an injective and surjective renaming, it is straightforward to obtain its inverse by inverting $M(-)$.
+
+\subsection{Applications}
+
+Canonical isomorphisms.
+
+User-declared atomic morphisms.
+
+\paragraph{Extending Theories from the Outside}
+
+\paragraph{Transparent Refactoring}
+A major drawback of OpenMath/\mmt-style qualified identifiers is that it can preclude transparent refactoring.
+For example, consider a theory $t=\{\icl{r},\icl{s}\}$ and assume we want to move a symbol $n$ from $r$ to $s$.
+This requires changing any qualified reference to $r?n$ (in any theory including $t$) to $s?n$.
+That can be very costly, especially in large libraries where the refactorer might not even know of or have write access to all theories importing $t$.
+
+With implicit morphisms, we rename $s$ to $s'$, move $n$ from $s'$ to $r$, and recover $s$ by $s=\{\icl{s'},n\}$.
+Now we can change define $t=\{\icl{r},\icl{s'}\}$ and give an implicit morphism from $s$ to $t$, which maps $s?n$ to $r?n$.
+All existing references to $s?n$ stay well-formed (and serve as aliases for $r?n$) so that no further changes in theories importing $t$ are needed.
