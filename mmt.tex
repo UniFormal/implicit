@@ -1,131 +1,230 @@
-The \mmt language \cite{RK:mmt:10} provides an extremely general setting in which we can define theories.
-The precise definitions of the well-formed theories $T$ and theory morphisms $M$ on the one hand and their semantics $\flt{T}$ and $\flt{M}$ on the other hand are \textbf{mutually recursive}.
-Therefore, we first give an overview and then recap the definitions below.
+\subsection{Overview}
 
-\textbf{Flat theories} are lists of symbol declarations $c[:E][=e]$ where $E$ and $e$ are optional expressions.
-\textbf{Flat morphisms} from a theory $S$ to a theory $T$ are lists of symbol assignments $c:=e$ where $c$ is declared in $S$ and $e$ is an expression over $T$.
-We write $\dom{T}$ for the set of constant identifiers $c$ in $\flt{T}$ and $\Exp{T}$ for the set of closed expressions using only the symbols $c\in\dom{T}$.
-Every morphism $M$ induces a \textbf{homomorphic extension} $M(-):\Exp{S}\to\Exp{T}$, which replaces every $c\in\dom{S}$ in an $S$-expressions with the $T$-expressions $o$ such that $(c:=o) \in \flt{M}$.
-Both theories and morphisms are subject to typing conditions that are not essential for our purposes here.
-
-Flat theories and morphisms are rarely constructed in practice --- instead, users often construct larger theories from smaller ones.
-We distinguish two kinds of constructions:
+\paragraph{Modularity in MMT}
+As much as possible, theories and morphisms are treated uniformly, and we use the word \textbf{module} to refer to them collectively.
+\mmt allows constructing large modules from small ones in two ways:
 \begin{compactitem}
- \item \textbf{Structured theories} contain additional declarations such imports and instantiations or high-level declarations.
- \item \textbf{Theory expressions} are operators that take (normal or theory) expressions as input and return theory expressions.
+  \item \textbf{structured modules} contain declarations that import other, previously defined ones,
+  \item \textbf{module expressions} are anonymous expressions (akin to formulas, terms, etc.) that denote modules.
 \end{compactitem}
-This distinction is orthogonal to the semantic variety, and both kinds are equally expressive, e.g., we can construct the union of two theories using either construction.
-For example, we can construct the theory of commutative groups as the structured theory containing the declarations $\icl{Group},\icl{CommutativeMagma}$ or as the theory expression $\cn{Group}\cup\cn{CommutativeMagma}$.
-All of the above applies analogously to structured \emph{morphisms} and \emph{morphism} expressions.
 
-Despite the syntactic difference, the semantics of both kinds of constructions can be defined by uniformly by mapping structured theories/theory expressions $T$ to flat theories $\flt{T}$.
-We call this mapping \textbf{flattening}.
+These two kinds of constructions have very different advantages but the same expressivity.
+For example, we can construct the theory of commutative groups as the structured theory $\cn{CommutativeGroup}=\{\icl{Group},\icl{CommutativeMagma}\}$ or as the theory expression $\cn{Group}\cup\cn{CommutativeMagma}$.
+The former is more practical when building named toplevel theories in software systems because each include is a separate declaration that can be parsed, checked, and flattened individually.
+While negligible in this example, this becomes relevant quickly in large theories with complex structure.
+The latter is more practical when building anonymous theory that are only needed temporarily.
+In software systems, they also allow reusing operations like equality and $\lambda$-abstraction that already be implemented at the level of the base logic.
+Building large morphism is as important as building large theories: for example, we want to be able to build morphisms out of $\cn{CommutativeGroup}$ by combining compatible morphisms out of $\cn{Group}$ and $\cn{CommutativeMagma}$.
 
-An MMT \textbf{diagram} consists of a set of structured theory/morphism declarations and induces sets of theory and morphism expressions.
-The names of the former are the \textbf{atomic theories/morphisms}, and they provide the base case of the inductive construction of the latter.
-Vice versa, the latter may already occur in the bodies of the structured declarations.
-Thus, the two concepts must be defined by mutual recursion.
+\paragraph{Flat Modules}
+\mmt provides formal syntax for both structured modules and module expressions and defines their semantics via \textbf{flattening}, which defines for every module $M$ a flat module $\flt{M}$.
 
-More formally, every diagram induces sets
+\textbf{Flat theories} are lists of declarations $c[:E][=e]$ where $E$ and $e$ are optional expressions.
+We write $\dom{T}$ for the set of constant identifiers $c$ in $\flt{T}$ and $\Exp{T}$ for the set of closed expressions using only the symbols $c\in\dom{T}$.
+Constant declarations subsume virtually all basic declarations common in formal systems such as type/function/predicate symbols, axioms, theorems, inference rules, etc.
+In particular, theorems can be represented via the propositions-as-types correspondence as declarations $c:F=p$, which establish theorem $F$ via proof $p$.
+Similarly, \mmt expressions subsume virtually all objects common in formal systems such as terms, types, formulas, proofs.
+
+Individual formal languages arise as fragments of \mmt: they single out the well-formed expressions by defining the two \mmt-\textbf{judgments} $\der_T o:o'$ (typing) and $\der_T o\equiv o'$ (equality) for every theory $T$ and $o,o'\in\Exp{T}$.
+%This is already sufficient to define logical theorems as those formulas $F$ for which there is an object $p$ (the proof) such that $\der_T p:F$.
+The details can be found in \cite{rabe:howto:14}.
+
+\textbf{Flat morphisms} from a theory $S$ to a theory $T$ are lists of assignments $c:=e$ where $c\in\dom{S}$ and $e\in\Exp{T}$.
+Every morphism $M$ induces a \textbf{homomorphic extension} $M(-):\Exp{S}\to\Exp{T}$, which replaces every $c\in\dom{S}$ in an $S$-expression with the $T$-expression $e$ such that $c:=e$ in $M$.
+
+Both theories and morphisms are subject to typing conditions that are not essential for our purposes here.
+We only mention the main theorem that guarantees that well-typed morphisms preserve judgments, i.e., if $\vdash_S e:E$, then $\vdash_T M(e):M(E)$.
+This includes the preservation of truth via the propositions-as-types principle where $E$ is a proposition and $e$ its proof.
+
+An \mmt \textbf{diagram} consists of a set of named structured module declarations and induces sets of anonymous module expressions.
+These are mutually recursive: the names of the former provide the base cases for inductively forming the latter, and the latter may occur in the bodies of the former.
+Every diagram induces sets
 \begin{compactitem}
- \item $\thy$ of identifiers of atomic theories $t$,
+ \item $\thy$ of identifiers of theories $t$,
  \item $\Thy\supseteq \thy$ of theory expressions $T$,
  \item $\mo{S}{T}$ of identifiers of atomic morphisms $m$ from $S$ to $T$, and
  \item $\Mo{S}{T}\supseteq\mo{S}{T}$ of morphism expressions $M$ from $S$ to $T$.
 \end{compactitem}
 Then flattening assigns
 \begin{compactitem}
- \item to each $T\in\Thy$ the flat theory $\flt{T}$ (seen as a set of declarations),
- \item to each $M\in\Mo{S}{T}$ the morphism $\flt{M}$ from $\flt{S}$ to $\flt{T}$ (seen as a set of assignments).
+ \item to each $T\in\Thy$ the flat theory $\flt{T}$,
+ \item to each $M\in\Mo{S}{T}$ the morphism $\flt{M}$ from $\flt{S}$ to $\flt{T}$.
 \end{compactitem}
-
-Within this framework, we can define new kinds of structuring declarations and new kinds of expression-forming operators along with their flattening.
-In both cases, the semantics should be \textbf{compositional} in the following sense:
-The flattening of a structured theory arises as the union of the flattenings of each declaration in it.
-More formally, for a list $D$ of declarations and a declaration $d$, we have $\flt{D,d}=\flt{D}\cup\fltd{\flt{D}}{d}$ where $\fltd{T}{d}$ defines the semantics of declaration $d$ in the context of theory $T$.
-Similarly, the flattening of a theory expression such as $f(S,T)$ depends only on the flattenings of its arguments
-More formally, e.g., for theory expressions $S$ and $T$ and a binary theory-forming operator $f$, we have $(\flt{f(S,T)}=\flt{f}(\flt{S},\flt{T})$ where $\flt{f}$ is a function defining the semantics of $f$.
 
 \subsection{Syntax}
 
-We use the non-modular variant of \mmt, which does not use imports and instantiations between theories.
-The full version can be found in \cite{RK:mmt:10}.
+We start with the syntax for theories (which arises as a special case of the one given in \cite{RK:mmt:10}):
 
 \begin{definition}[Theory]\label{def:theory}
 A \textbf{theory} $T$ is of the form
 \begin{grammar}
-TDec     & t=\{Dec,\ldots,Dec\}  & \text{atomic theory declaration} \\
-Dec      & n\opt{:o}\opt{=o}     & \text{symbol declaration}\\
-c        & t?n                   & \text{qualified symbol identifiers} \\
-o        & c \alt \ldots         & \text{OpenMath objects built from symbols $c$} \\
-T        & t                     & \text{theories} 
+TDec     & t=\{Dec,\ldots,Dec\}  & \text{theory declaration} \\
+Dec      & n\opt{:o}\opt{=o}     & \text{constant declaration}\\
+c        & t?n                   & \text{qualified constant identifiers} \\
+o        & c \alt \ldots         & \text{expressions built from constants} \\
+T        & t                     & \text{theory expressions}
 \end{grammar}
 
-In an atomic theory, each symbol \textbf{name} $n$ may be declared only once, and its \textbf{type} and \textbf{definiens} (if present) must be closed OpenMath objects using only previously introduced symbols.
-We omit the remaining productions for objects here.
+In a theory declaration, each symbol \textbf{name} $n$ may be declared only once, and its \textbf{type} and \textbf{definiens} (if present) must be closed expressions only previously introduced constants.
+We omit the remaining productions for expressions here, which allow forming complex expressions using application, binding, variables, literals, etc.
 \end{definition}
 
-These theories are similar to OpenMath content dictionaries \cite{openmath}.
-In particular, \mmt uses OpenMath-style qualified symbol identifiers $t?n$.%
-\footnote{Of course, the \mmt IDE and web interface parse and display these identifiers only as $n$ (if that is unambiguous), especially if they are used in formulas.
-But the interface always knows the qualified identifier and shows it, e.g., on hover.}
-Thus, symbols of the same name declared in different atomic theories are always distinguished.
+At this point, this grammar only allows forming flat theories, i.e., $\Thy=\thy$.
+It is intentionally independent of the concrete choice of modularity principles, i.e., the kinds of module-structuring declarations (e.g., includes) and the module-expression-forming operators (e.g., union).
+But it already introduces all non-terminals for modularity: new declaration kinds for structured theories arise by adding production for the non-terminal $Dec$ and new theory expressions are formed by adding productions for the non-terminal $T$.
+This makes it easy to incrementally add new declaration kinds and operators to the language.
 
-Symbol declarations subsume virtually all basic declarations common in formal systems such as type/function/predicate symbols, axioms, theorems, inference rules, etc.
-In particular, theorems can be represented via the propositions-as-types correspondence as declarations $c:F=p$, which establish theorem $F$ via proof $p$.
-Similarly, objects subsume virtually all objects common in formal systems such as terms, types, formulas, proofs.
+%These theories are similar to OpenMath content dictionaries \cite{openmath}.
+%In particular, \mmt uses OpenMath-style qualified symbol identifiers $t?n$.%
+%\footnote{Of course, the \mmt IDE and web interface parse and display these identifiers only as $n$ (if that is unambiguous), especially if they are used in formulas.
+%But the interface always knows the qualified identifier and shows it, e.g., on hover.}
+%Thus, symbols of the same name declared in different atomic theories are always distinguished.
 
-Individual formal languages arise as fragments of \mmt: They single out the well-formed objects by defining the two \mmt-\textbf{judgments} $\der_T o:o'$ (typing) and $\der_T o\equiv o'$ (equality) for every theory $T$ and $o,o'\in\Exp{T}$.
-%This is already sufficient to define logical theorems as those formulas $F$ for which there is an object $p$ (the proof) such that $\der_T p:F$.
-The details can be found in \cite{rabe:howto:14}.
+We proceed accordingly for flat morphisms:
 
 \begin{definition}[Morphism]\label{def:morphism}
-For two theories $S$ and $T$, a \textbf{morphism} $M$ is of the form
+A \textbf{morphism} is of the form
 \begin{grammar}
-MDec   & m:T\to T=\{Ass,\ldots,Ass\}     & \text{atomic morphism declaration}\\
+MDec   & m:T\to T=\{Ass,\ldots,Ass\}     & \text{flat morphism declaration}\\
 Ass    & c:=o                            & \text{assignment to symbol}\\
-M      & m \alt \id{T} \alt M;M          & \text{morphisms} 
+M      & m                               & \text{morphism expressions}
 \end{grammar}
 such that a morphism declaration contains exactly one assignment $c:=o$ for each $c\in\dom{S}$, all of which satisfying $o\in\Exp{T}$.
 \end{definition}
 
-Crucially, morphisms \textbf{preserve judgments}, in particular they map theorems to theorems.
-Formally, an atomic morphism $m:S\to T$ is \emph{well-formed} if
-\begin{compactitem}
-\item whenever $c$ has type $t$ in $\flt{S}$ and $c:= o$ in $\flt{m}$, then $\der_T o:m(t)$,
-\item whenever $c$ has definiens $d$ in $\flt{S}$ and $c:= o$ in $\flt{m}$, then $\der_T o\equiv m(d)$.
-\end{compactitem}
-Then we can show that for every $M\in\Mo{S}{T}$ if $\der_S o:o'$ (or $\der_S o\equiv o'$), then $\der_T M(o):M(o')$ (or $\der_T M(o)\equiv M(o')$).
-The details can be found in \cite{rabe:howto:14}.
-%In particular, this means that $M$ maps $S$-theorems to $T$-theorems.
+%Crucially, morphisms \textbf{preserve judgments}, in particular they map theorems to theorems.
+%Formally, an atomic morphism $m:S\to T$ is \emph{well-formed} if
+%\begin{compactitem}
+%\item whenever $c$ has type $t$ in $\flt{S}$ and $c:= o$ in $\flt{m}$, then $\der_T o:m(t)$,
+%\item whenever $c$ has definiens $d$ in $\flt{S}$ and $c:= o$ in $\flt{m}$, then $\der_T o\equiv m(d)$.
+%\end{compactitem}
+%Then we can show that for every $M\in\Mo{S}{T}$ if $\der_S o:o'$ (or $\der_S o\equiv o'$), then $\der_T M(o):M(o')$ (or $\der_T M(o)\equiv M(o')$).
+%The details can be found in \cite{rabe:howto:14}.
+%%In particular, this means that $M$ maps $S$-theorems to $T$-theorems.
+
+Finally, we define diagrams as collections of modules:
 
 \begin{definition}[Diagram]
-A \textbf{diagram} is a list of atomic theory and morphism declarations:
+A \textbf{diagram} is a list of theory and morphism declarations:
 \begin{grammar}
 Dia    & \rep{(TDec \alt MDec)}          & \text{diagrams}\\
 \end{grammar}
-A diagram is well-formed if each atomic theory/morphism declaration is well-formed relative to the diagram preceding it.
+A diagram is well-formed if each atomic theory/morphism declaration has a unique name is well-formed relative to the diagram preceding it.
 \end{definition}
+
+We give some examples how to add modularity principles to the grammar:
+
+\begin{example}[Includes]\label{syn:incl}
+We extend the grammar with
+\begin{grammar}
+  Dec & \icl{S} & \text{include a theory into a theory} \\
+  Ass & \icl{M} & \text{include a morphism into a morphism}
+\end{grammar}
+\end{example}
+
+\begin{example}[Union]\label{syn:union}
+We extend the grammar with
+\begin{grammar}
+  T   & T\cup T & \text{union of theories} \\
+  M   & M\cup M & \text{union of morphisms}
+\end{grammar}
+\end{example}
+
+\begin{example}[Category of Theories]\label{syn:cat}
+To obtain the category structure of theories and morphisms, we need identity and composition.
+We add them to the grammar as follows:
+\begin{grammar}
+  M   & \id{T} & \text{identity morphism} \\
+  M   & M;M    & \text{morphism composition}
+\end{grammar}
+\end{example}
+
+For each example, we will define the semantics in the next section.
 
 \subsection{Semantics}
 
-\paragraph{Induced Declarations and Assignments}
-For every atomic theory $t=\{\Sigma\}$, we have $t\in\Thy$.
-We define $\flt{t}$ by induction on the declarations in $\Sigma$:
- \[\flt{\cdot}=\es\]
- \[\flt{(\Sigma,\;n[:t][=d])}=\flt{\Sigma}\cup\{t?n[:t][=d]\}\]
-where $\cdot$ is the empty sequence.
-Correspondingly, for every atomic morphism $m:S\to T=\{\sigma\}$, we have $m\in\Mo{S}{T}$ and $\flt{m}$ is defined by induction on the assignments in $\sigma$:
- \[\flt{\cdot}=\es\]
- \[\flt{(\sigma,\;c:=o)}=\flt{\sigma}\cup\{c:=o\}\]
+\paragraph{Flattening}
+Just like the syntax, the definition of flattening is \textbf{compositional} in the sense that new modularity principles can be added later independently of each other.
+In particular, for every module expression $X$, we define its flattening $\flt{X}$ by induction on the syntax.
+This follows the principle of compositional semantics, e.g., $\flt{(f(X,Y))}$ depends only on $\flt{X}$ and $flt{Y}$. 
 
-For the remaining morphisms, the semantics is not as trivial but still straightforward.
-For the identity, we have $\id{T}\in\Mo{T}{T}$ if $S\in\Thy$, and $\flt{\id{T}}=\{c:=c|c\in\dom{T}\}$.
-For the composition, we have $M;N\in\Mo{R}{T}$ if $M\in\Mo{R}{S}$ and $N\in\Mo{S}{T}$, and $\flt{(M;N)}=\{c:=N(M(c))|c\in\dom{R}\}$.
+For theories $T$, at this point, this induction only has the base case of a reference to a declared theory $t$.
+Further cases arise when we add structuring declarations.
 
-\paragraph{Equality and Inclusion}
-We say that $S$ is \textbf{included} into $T$, written $S\harr T$, if $\flt{S}\sq\flt{T}$.
-%In that case, there is an inclusion morphism $S\to T$ (which we also denote $S\harr T$) defined by $\flt{m}=\flt{\id{S}}$.
+For the base case, of a theory $t=\{\Sigma\}$, we define $\flt{t}$ by induction on the declarations in $\Sigma$:
+\[\flt{t}=\flt{\Sigma}\]
+where
+ \[\flt{\cdot}=\es\]
+ \[\flt{(\Sigma,D)}=\flt{\Sigma}\cup\fltd{\flt{\Sigma}}{D}\]
+Here $\fltd{T}{D}$ is the flattening of declaration $d$ in the context of theory $T$.
+
+At this point, we only have one case for declarations $D$, namely constant declarations.
+Their flattening is trivial:
+ \[\fltd{\Sigma}{n[:E][=e]}=\{t?n[:E][=e]\}\]
+where $t$ is the name of the containing theory.
+
+Correspondingly, for a declared morphism $m:S\to T=\{\sigma\}$, we have $m\in\Mo{S}{T}$ and $\flt{m}$ is defined by induction on the assignments in $\sigma$:
+ \[\flt{\cdot}=\es\]
+ \[\flt{(\sigma,\;A)}=\flt{\sigma}\cup\fltd{\flt{\sigma}}{A}\]
+with the trivial base case
+ \[\fltd{\sigma}{c:=e}=\{c:=o\}\]
+\bigskip
+
+The semantics serves two purposes:
+firstly, it flattens every well-formed module into a flat one;
+secondly, it determines which modules are well-formed at all.
+It is desirable to define well-formedness independently of flattening.
+However, in practice, it shows that implementations typically have to do almost the entire flattening to check well-formedness anyway.
+
+Therefore, it is convenient to merge the two into one operation by simply making flattening a partial function: a module $X$ is \textbf{well-formed} iff $\flt{X}$ is defined.
+\bigskip
+
+\begin{example}[Includes (continued from Ex.~\ref{syn:incl})]\label{sem:incl}
+Includes add new declarations $D$, so we have to add cases to the definition of $\fltd{\Sigma}{D}$.
+We do this as follows
+  \[\fltd{\Sigma}{\icl{S}} = \flt{S}\]
+This has the effect of copying over all declarations from the included into the including theory.
+
+Note that the definition of $\fltd{\Sigma}{n:E=e}$ qualifies the constant name $n$ with the theory name $t$ to form the identifier $t?n$ in the flattening.
+Therefore, includes can never lead to name clashes.
+
+Also note, that because $\flt{S}$ is a \textit{set} of declarations, the include relation is transitive: if $t$ includes $s$ via two different paths, $\flt{t}$ only contains one copy of the declarations of $\flt{s}$.
+The situation is slightly more complicated for morphisms: if a morphism out of $t$ includes two different morphisms out of $s$, these have to agree.
+Therefore, flattening and well-formedness must be distinguished:
+  \[\fltd{\sigma}{\icl{M}} = \flt{M}\]
+under the condition $\flt{M}$ agrees with $\flt{\sigma}$ on any constant that is in the domain of both.
+\end{example}
+
+\begin{example}[Union (continued from Ex.~\ref{syn:union})]\label{sem:union}
+We define the semantics of unions of theories as
+\[\flt{(S\cup T)}=\flt{S}\cup\flt{T}\]
+The handling of name clashes is the same as for includes:
+Because the theories declared in a diagram have unique names and declarations in the flattening are qualified by theory names, union theories cannot have name clashes.
+But we have to watch out when taking unions of morphisms:
+We define $M_1\cup M_2\in \Mo{S_1\cup S_2}{T}$ if $M_i\in\Mo{S_i}{T}$ and $M_1$ and $M_2$ agree for every constant in $\dom{\flt{S_1}}\cap\dom{\flt{S_2}}$.
+In that case, we put
+\[\flt{(M\cup N)}=\flt{M}\cup\flt{N}\]
+\end{example}
+
+Finally, we define the semantics of the category structure:
+\begin{example}[Category of Theories (continued from Ex.~\ref{syn:cat})]\label{sem:cat}
+For $T\in\Thy$, we put $\id{T}\in\Mo{T}{T}$ and define
+\[\flt{\id{T}}=\{c:=c \;|\; c\in\dom{\flt{T}}\}\]
+
+For $R,S,T\in\Thy$ and $M\in\Mo{R}{S}$ and $N\in\Mo{S}{T}$, we put $M;N\in\Mo{R}{T}$ and define
+\[\flt{M;N}=\{c:=\flt{N}(\flt{M}(c)) \;|\; c\in\dom{\flt{R}}\}\]
+\end{example}
+
+%Includes between theories are always well-formed (assuming the included theory is).
+%But includes between morphisms are more difficult -- we have to impose two restrictions.
+%Firstly, an assignment $\icl{M}$ is well-formed in an atomic morphism $m:S\to T$ if $R\harr S$ and $M\in\Mo{R}{T}$.
+%Its intended effect is that $m$ maps all $c\in\dom{R}$ to $M(c)$.
+%That yields the second restriction: For any two morphisms $M_i\in\Mo{R_i}{T}$ included into $m$ and any theory $C$ satisfying $C\harr R_1$ and $C\harr R_2$, we require that $M_1|_C\equiv M_2|_C$.
+%Thus, any two included morphisms must agree on their common domain $C$; that is necessary so that $\flt{m}$ does not contain multiple assignments for the same identifier.
+
+\subsection{Semantic Relations}
+
+For two theories $S,T\in\Thy$, we say that $S$ is \textbf{included} into $T$, written $S\harr T$, if $\flt{S}\sq\flt{T}$.
 %Clearly, $m(o)=o$ for all $S$-objects $o$.
 Thus, every declaration of $S$ is also available in $T$ and $\Exp{S}\sq\Exp{T}$.
 This induces an inclusion morphism, which maps every $c\in\dom{S}$ to itself.
@@ -136,22 +235,24 @@ We say that two theories $S,T\in\Thy$ are \textbf{equal}, written $S\equiv T$, i
 This is equivalent to $S\harr T$ and $T\harr S$.
 
 Correspondingly, we say that two morphisms $M,N\in\Mo{S}{T}$ are \textbf{equal}, written $M\equiv N$, if $\flt{M}=\flt{N}$.
-In that case, $\der_T M(o)\equiv N(o)$ for all well-formed $S$-objects $o\in\Exp{S}$.
+In that case, $M(e)=N(e)$ for all expressions $e\in\Exp{S}$.
 
 Clearly, $\equiv$ is an equivalence relation and $\harr$ is an order relation (if anti-symmetry is taken with respect to $\equiv$).
+
+\begin{example}[Includes (continued from Ex.~\ref{sem:incl})]\label{rel:incl}
+We have the following soundness theorem for includes: if a theory is declared as $t=\{\Sigma\}$ and $\Sigma$ contains $\icl{S}$, then $S\harr t$.
+
+Note that in the absence of include declarations or unions, $s\harr t$ never holds because all $c\in\dom{s}$ are of the form $s?n$ and all $c\in\dom{t}$ are of the form $t?n$.
+In fact, $\flt{s}$ and $\flt{t}$ unless $s=t$.
+\end{example}
+
+\begin{example}[Union (continued from Ex.~\ref{sem:union})]\label{rel:union}
+We have the following soundness theorem for unions: $S_i\harr S_1\cup S_2$.
+Moreover, $S_1\cup S_2$ is a colimit in the category of theories and morphism, and $M_1\cup M_2\in\Mo{S_1\cup S_2}{T}$ is the universal morphism out of it.
+\end{example}
+
+\begin{example}[Category of Theories (continued from Ex.~\ref{sem:cat})]\label{rel:cat}
 Identity and composition are congruent with respect to $\equiv$.
 Moreover, composition is associative and identity neutral with respect to $\equiv$.
-Thus, each diagram yields the structure of a category.
-
-\paragraph{Preview}
-The above recap of (the non-modular fragment of) \mmt deviates from \cite{RK:mmt:10}, very carefully wording the definitions in a way that makes stating the results of this paper most elegant.
-Thus, we intentionally introduced some peculiarities:
-\begin{compactitem}
-\item We have $\Thy=\thy$ because there are no non-atomic theories.
-We will introduce some in Sect.~\ref{sec:complex}.
-\item The definitions of $\flt{t}$ and $\flt{m}$ are overly complicated.
-That will pay off when we introduce additional declarations in Sect.~\ref{sec:include}: We can define their semantics simply by adding a case to the inductions in $\flt{\Sigma}$ and $\flt{\sigma}$.
-\item $s\harr t$ never holds because all $c\in\dom{s}$ are of the form $s?n$ and all $c\in\dom{t}$ are of the form $t?n$.
-In fact, $\flt{S}$ and $\flt{T}$ are disjoint whenever $S\neq T$.
-That will change when we introduce include declarations in Sect.~\ref{sec:include}.
-\end{compactitem}
+Thus, each diagram indeed yields the structure of a category with objects $\Thy$ and arrows $\Mo{S}{T}$.
+\end{example}

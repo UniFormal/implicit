@@ -1,3 +1,33 @@
+\documentclass[orivec]{llncs}
+
+\usepackage{graphicx,url,wrapfig,amsmath,amssymb}
+
+\usepackage[show]{ed} %for ednotes
+
+\usepackage{sembracket}
+\usepackage{mytikz}
+\usepackage{basics}
+%\usepackage[llncs]{theorems} %only for now so that the environments are defined; replace with nice package for this later
+\usepackage{local}
+
+\setcounter{tocdepth}{3}
+\usepackage[bookmarks,linkcolor=red,citecolor=blue,urlcolor=gray,colorlinks,breaklinks,bookmarksopen,bookmarksnumbered]{hyperref}
+
+\setlength{\hfuzz}{3pt}
+\hbadness=10001 %make box warning less strict
+
+\begin{document}
+\title{Structuring Theories with Implicit Morphisms}
+\author{Florian Rabe$^{1,2}$ \and Dennis M\"uller$^2$}
+\institute{LRI Paris \and FAU Erlangen-Nuremberg}
+\maketitle
+
+\begin{abstract}
+We introduce \emph{implicit} morphisms as a concept in formal systems based on theories and theory morphisms.
+The idea is that there may be at most one implicit morphism from a theory $S$ to a theory $T$, and if $S$-expressions are used in $T$ their semantics is obtained by automatically inserting the implicit morphism.
+The practical appeal of implicit morphisms is that they hit the sweet-spot of being extremely simple to understand and implement while significantly helping with structuring large collections of theories.
+\end{abstract}
+
 Theory morphisms have proved an essential tool for managing collections of theories in logics and related formal systems.
 They can be used to structure theories and build large theories modularly from small components or to relate different theories to each other \cite{asl,devgraphs,littletheories}.
 Areas in which tools based on theories and theory morphisms have been developed include specification \cite{obj,hets}, rewriting \cite{maude}, theorem proving \cite{imps}, and knowledge representation \cite{RK:mmt:10}.
@@ -42,3 +72,7 @@ In fact, this principle works so well that we have refactored our \mmt system (o
 The semantics of inclusion morphisms is obtained by saying that inclusions are implicit morphisms that map all identifiers to themselves.
 Even the fundamental property that a theory may reference its own identifiers is now just a consequence of the fact that all identity morphisms are implicit.
 Therefore, surprisingly, adding implicit morphisms deep in the \mmt kernel has made its design more elegant.
+
+\bibliographystyle{alpha}
+\bibliography{../../../Program_Data/Latex/bib/rabe,../../../Program_Data/Latex/bib/systems,../../../Program_Data/Latex/bib/institutions,../../../Program_Data/Latex/bib/pub_rabe,../../../Program_Data/Latex/bib/historical}
+\end{document}

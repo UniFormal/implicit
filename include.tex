@@ -13,27 +13,6 @@ Structure declarations on the other hand introduce a name in order to form quali
 
 \subsection{Definition}
 
-We extend the \mmt grammar with
-\begin{grammar}
-  Dec & \icl{S} & \text{include a theory into an atomic theory} \\
-  Ass & \icl{M} & \text{include a morphism into an atomic morphism}
-\end{grammar}
-
-We extend the definitions of $\flt{\Sigma}$ with the case
-  \[\flt{(\Sigma,\;\icl{S})} = \flt{\Sigma}\cup\flt{S}\]
-and the definition of $\flt{\sigma}$ with the case
-  \[\flt{(\sigma,\;\icl{M})}=\flt{\sigma}\cup\flt{M}\]
-%  \[\flt{(\Sigma,\;\strc{s}{S})} = \flt{\Sigma}\cup\{t?s/n[:t'][=d'] | n[:t][=d]\in \flt{S}\}\]
-%where $t'$ and $d'$ arise from $t$ and $d$ by renaming all symbol identifiers accordingly.
-%  \[\flt{(\sigma,\;\strca{M})}=\flt{\sigma}\cup\{t?s/n:=M(\flt{M}\]
-In particular, this yields $S\harr t$ whenever $t$ declares an include of $S$.
-
-Includes between theories are always well-formed (assuming the included theory is).
-But includes between morphisms are more difficult -- we have to impose two restrictions.
-Firstly, an assignment $\icl{M}$ is well-formed in an atomic morphism $m:S\to T$ if $R\harr S$ and $M\in\Mo{R}{T}$.
-Its intended effect is that $m$ maps all $c\in\dom{R}$ to $M(c)$.
-That yields the second restriction: For any two morphisms $M_i\in\Mo{R_i}{T}$ included into $m$ and any theory $C$ satisfying $C\harr R_1$ and $C\harr R_2$, we require that $M_1|_C\equiv M_2|_C$.
-Thus, any two included morphisms must agree on their common domain $C$; that is necessary so that $\flt{m}$ does not contain multiple assignments for the same identifier.
 
 \subsection{Discussion}
 
