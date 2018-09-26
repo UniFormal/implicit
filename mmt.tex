@@ -24,17 +24,17 @@ Building large morphism is as important as building large theories: for example,
 \textbf{Flat theories} are lists of declarations $c[:E][=e]$ where $E$ and $e$ are optional expressions.
 We write $\dom{T}$ for the set of constant identifiers $c$ in $\flt{T}$ and $\Exp{T}$ for the set of closed expressions using only the symbols $c\in\dom{T}$.
 Constant declarations subsume virtually all basic declarations common in formal systems such as type/function/predicate symbols, axioms, theorems, inference rules, etc.
-In particular, theorems can be represented via the propositions-as-types correspondence as declarations $c:F=p$, which establish theorem $F$ via proof $p$.
+In particular, theorems can be represented via the propositions-as-types correspondence as declarations $c:F=P$, which establish theorem $F$ via proof $P$.
 Similarly, \mmt expressions subsume virtually all objects common in formal systems such as terms, types, formulas, proofs.
 
-Individual formal languages arise as fragments of \mmt: they single out the well-formed expressions by defining the two \mmt-\textbf{judgments} $\der_T o:o'$ (typing) and $\der_T o\equiv o'$ (equality) for every theory $T$ and $o,o'\in\Exp{T}$.
+Individual formal languages arise as fragments of \mmt: they single out the well-formed expressions by defining the two \mmt-\textbf{judgments} $\der_T e:e'$ (typing) and $\der_T e\equiv e'$ (equality) for every theory $T$ and $e,e'\in\Exp{T}$.
 %This is already sufficient to define logical theorems as those formulas $F$ for which there is an object $p$ (the proof) such that $\der_T p:F$.
 The details can be found in \cite{rabe:howto:14}.
 
 \textbf{Flat morphisms} from a theory $S$ to a theory $T$ are lists of assignments $c:=e$ where $c\in\dom{S}$ and $e\in\Exp{T}$.
 Every morphism $M$ induces a \textbf{homomorphic extension} $M(-):\Exp{S}\to\Exp{T}$, which replaces every $c\in\dom{S}$ in an $S$-expression with the $T$-expression $e$ such that $c:=e$ in $M$.
 
-Both theories and morphisms are subject to typing conditions that are not essential for our purposes here.
+The declarations in theories and morphisms are subject to typing conditions that are not essential for our purposes here.
 We only mention the main theorem that guarantees that well-typed morphisms preserve judgments, i.e., if $\vdash_S e:E$, then $\vdash_T M(e):M(E)$.
 This includes the preservation of truth via the propositions-as-types principle where $E$ is a proposition and $e$ its proof.
 
@@ -52,6 +52,34 @@ Then flattening assigns
  \item to each $T\in\Thy$ the flat theory $\flt{T}$,
  \item to each $M\in\Mo{S}{T}$ the morphism $\flt{M}$ from $\flt{S}$ to $\flt{T}$.
 \end{compactitem}
+
+\paragraph{Well-Formedness}
+The inference system to define well-formed modules, and expressions is not a primary interest of this paper.
+Therefore, we only mention those aspects that are relevant later on.
+
+However, one detail will be critical later on:
+the inference rules for the well-formedness of expressions include the following base case for constants:
+\[\rul{c:E[=e] \minn \flt{T}}{\vdash_T c:E} \tb \rul{c[:E]=e \minn \flt{T}}{\vdash_T c=e}\]
+Correspondingly, the definition of the homomorphic extension of a morphism includes the following base case for constants:
+\[M(c) = e \mwhere c:= e\in\flt{M}\]
+
+These base cases introduce a mutual recursion between well-formedness and flattening:
+the well-formedness of a declaration in a theory depends on the flattening of all preceding declarations;
+and the well-formedness of an assignment in a morphism depends on the homomorphic extension of the morphism obtained by flattening of all preceding assignments.
+Vice versa, well-formedness is a precondition for defining the flattening.
+It is desirable to define well-formedness independently of flattening.
+But the mutual recursion makes sense from an implementation perspective: typical tools for formal systems will first parse, check, and flatten the first declaration, then continue with the next declaration.
+In fact, often the checking of well-formedness is as expensive as flattening anyway.
+
+Therefore, we will make flattening a partial function, i.e., $\flt{X}$ is defined iff the module $X$ is well-formed. 
+
+%Consider any declaration $n[:E][=e]$ in the body of a theory $t$.
+%It is well-formed if $n$ is a fresh name $E$ and $e$ are well-formed expressions over $t$.
+%(Additionally, $E$ and $e$ must satisfy typing conditions that are not essential for our purposes.)
+%Importantly, $E$ and $e$ must be from $\Exp{\flt{t}}$ using only constants that were introduced in preceding declarations.
+%
+%Similarly, consider an assignment $c:=e$ in a morphism $m$ from $S$ to $T$, where $c:E$ is a declaration is $S$.
+%It is well-formed if $\vdash_T e:\flt{m}(E)$.
 
 \subsection{Syntax}
 
@@ -170,16 +198,6 @@ Correspondingly, for a declared morphism $m:S\to T=\{\sigma\}$, we have $m\in\Mo
  \[\flt{(\sigma,\;A)}=\flt{\sigma}\cup\fltd{\flt{\sigma}}{A}\]
 with the trivial base case
  \[\fltd{\sigma}{c:=e}=\{c:=o\}\]
-\bigskip
-
-The semantics serves two purposes:
-firstly, it flattens every well-formed module into a flat one;
-secondly, it determines which modules are well-formed at all.
-It is desirable to define well-formedness independently of flattening.
-However, in practice, it shows that implementations typically have to do almost the entire flattening to check well-formedness anyway.
-
-Therefore, it is convenient to merge the two into one operation by simply making flattening a partial function: a module $X$ is \textbf{well-formed} iff $\flt{X}$ is defined.
-\bigskip
 
 \begin{example}[Includes (continued from Ex.~\ref{syn:incl})]\label{sem:incl}
 Includes add new declarations $D$, so we have to add cases to the definition of $\fltd{\Sigma}{D}$.
@@ -224,7 +242,7 @@ For $R,S,T\in\Thy$ and $M\in\Mo{R}{S}$ and $N\in\Mo{S}{T}$, we put $M;N\in\Mo{R}
 %That yields the second restriction: For any two morphisms $M_i\in\Mo{R_i}{T}$ included into $m$ and any theory $C$ satisfying $C\harr R_1$ and $C\harr R_2$, we require that $M_1|_C\equiv M_2|_C$.
 %Thus, any two included morphisms must agree on their common domain $C$; that is necessary so that $\flt{m}$ does not contain multiple assignments for the same identifier.
 
-\subsection{Semantic Relations}
+\subsection{Semantic Properties}
 
 For two theories $S,T\in\Thy$, we say that $S$ is \textbf{included} into $T$, written $S\harr T$, if $\flt{S}\sq\flt{T}$.
 %Clearly, $m(o)=o$ for all $S$-objects $o$.

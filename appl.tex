@@ -1,0 +1,15 @@
+Canonical isomorphisms.
+
+User-declared atomic morphisms.
+
+\paragraph{Extending Theories from the Outside}
+
+\paragraph{Transparent Refactoring}
+A major drawback of OpenMath/\mmt-style qualified identifiers is that it can preclude transparent refactoring.
+For example, consider a theory $t=\{\icl{r},\icl{s}\}$ and assume we want to move a symbol $n$ from $r$ to $s$.
+This requires changing any qualified reference to $r?n$ (in any theory including $t$) to $s?n$.
+That can be very costly, especially in large libraries where the refactorer might not even know of or have write access to all theories importing $t$.
+
+With implicit morphisms, we rename $s$ to $s'$, move $n$ from $s'$ to $r$, and recover $s$ by $s=\{\icl{s'},n\}$.
+Now we can change define $t=\{\icl{r},\icl{s'}\}$ and give an implicit morphism from $s$ to $t$, which maps $s?n$ to $r?n$.
+All existing references to $s?n$ stay well-formed (and serve as aliases for $r?n$) so that no further changes in theories importing $t$ are needed.

@@ -1,4 +1,4 @@
-\subsection{Motivation}
+\subsection{Overview}
 
 The motivation behind implicit morphisms is to generalize the benefits of include declarations even further.
 Sometimes an atomic morphism is conceptually similar to an inclusion: For example, we might want to declare $m:\cn{Division}\to\cn{Group}=\{\cn{divide} := \lambda x,y.x\circ y^{-1}, \;\ldots\}$ to show how division is ``included'' into the theory of groups.
@@ -31,56 +31,56 @@ Crucially, we can use $s?n$ without bothering what $M$ is.
 
 %Thus the main question arises what other morphisms we should make implicit.
 
-\subsection{Definition}
+\subsection{Syntax}
 
-\paragraph{Syntax}
-We have already indicated that we will consider all identities and inclusions as implicit.
-It remains to give users the option introduce additional implicit morphisms.
-For that purpose, we allow two \mmt declarations to carry an attribute: 
+We introduce the family of sets $\IMo{S}{T}$ as a subset of $\Mo{S}{T}$, holding the \textit{implicit} morphisms.
+The intuition is that $\Thy$ and $\IMo{S}{T}$ (up to equality of morphisms) form a thin broad subcategory of $\Thy$ and $\Mo{S}{T}$.
+
+It remains to define which morphisms are implicit.
+For that purpose, we allow \mmt declarations to carry \textit{attributes}.
+Precisely, we add the following productions
 \begin{grammar}
-MDec   & Att\; m:T\to T=\{Ass,\ldots,Ass\}   & \text{attributed atomic morphism} \\
-Dec    & Att\; \icl{S}                       & \text{attributed inclusion}\\
-Att    & \keyword{implicit} \alt \keyword{invertible} & \text{attributes}
+MDec   & Att\; MDec  & \text{attributed morphism} \\
+Dec    & Att\; Dec   & \text{attributed declaration}\\
+Att    & \keyword{implicit} \alt \ldots & \text{attributes}
 \end{grammar}
 
-Every morphism with the attribute \keyword{implicit} occurs in the implicit-diagram.
-(Of course, this is redundant for includes.)
-Every morphism with the attribute \keyword{invertible} is also considered implicit, and additionally so is its inverse morphism.
+The set of attributes is itself extensible, and the above grammar only list the one that we use to get started.
+Additional attributes may be added with the condition that any additional attribute increases the set of implicit morphisms.
 
-We do not even have to provide a name for the inverse morphism: It is uniquely determined (up to $\equiv$) anyway, and it will be used only implicitly.
-We only have to make sure that the inverse actually exists and that it can be found automatically.
-This is not decidable in general, but it is decidable in many important special cases, in particular, renamings and definitional extensions.
+Specifically, the set $\IMo{S}{T}\sq\Mo{S}{T}$ of \textbf{implicit} morphisms contains the following elements:
+\begin{itemize}
+ \item all identity morphisms $\id{T}$,
+ \item all compositions $M;N$ of implicit morphisms $M$ and $N$,
+ \item all declared morphisms $m:S\to T=\{\sigma\}$ whose declaration carries the attribute $\keyword{implicit}$.
+\end{itemize}
 
-\paragraph{Semantics}
-Well-formedness and semantics are defined in parallel.
+\subsection{Semantics}
 
-\begin{definition}[Implicit-Diagram]
-Given a diagram $D$, its implicit-diagram $D^i$ contains all theories and the following morphisms:
-\begin{compactitem}
-\item all identities and inclusions,
-\item all compositions of implicit morphisms,
-\item every morphism with the \keyword{implicit} attribute,
-\item for each morphism with the \keyword{invertible} attribute, that morphism and its inverse. 
-\end{compactitem}
-\end{definition} 
+We only have to make two minor changes to the semantics to accommodate implicit morphisms.
+The first change govern how we obtain implicit morphisms, the second one how we use them.
 
-The only requirement for well-formedness is that the implicit-diagram always commutes.
-However, in general, commutativity may be undecidable.
-Similarly, the existence of an inverse morphism may be undecidable.
-Therefore, we use sound criteria for commutativity and invertibility as defined in Sect.~\ref{sec:commute} and \ref{sec:inverse}.
+\paragraph{Obtaining}
+We define well-formedness for our extended syntax.
+We define that an attribute to a declaration is only well-formed if the category of implicit morphisms remains thin, i.e., for any two theories, there may be only one (up to equality) implicit morphism between them.
+In other the diagram containing only the implicit morphisms must commute.
 
-\begin{definition}[Well-Formedness]
-Consider a well-formed diagram $D, m:S\to T=\{\sigma\}$.
-Let $D^a$ be $D, a\; m:S\to T=\{\sigma\}$.
-$D^{\keyword{implicit}}$ is well-formed if $D^i$ extended with an edge for $m$ commutes.
-$D^{\keyword{invertible}}$ is well-formed if $D^i$ extended with edges for $m$ and its inverse commutes.
+Depending on what modularity principles we add, equality of morphisms may or may not be decidable.
+Therefore, in the general case, implementations may have to employ sound but incomplete criteria for commutativity (see Sect.~\ref{sec:commute}).
 
-Correspondingly, consider a well-formed diagram $D$ of the form $D_0, T=\{\ldots,\icl{S},\ldots\}$.
-Let $D^a$ be $D_0, T=\{\ldots, a\; \icl{S},\ldots\}$.
-$D^{\keyword{invertible}}$ is well-formed if the inclusion has an *inverse.
-\end{definition}
+%\begin{definition}[Well-Formedness]
+%Consider a well-formed diagram $D, m:S\to T=\{\sigma\}$.
+%Let $D^a$ be $D, a\; m:S\to T=\{\sigma\}$.
+%$D^{\keyword{implicit}}$ is well-formed if $D^i$ extended with an edge for $m$ commutes.
+%$D^{\keyword{invertible}}$ is well-formed if $D^i$ extended with edges for $m$ and its inverse commutes.
+%
+%Correspondingly, consider a well-formed diagram $D$ of the form $D_0, T=\{\ldots,\icl{S},\ldots\}$.
+%Let $D^a$ be $D_0, T=\{\ldots, a\; \icl{S},\ldots\}$.
+%$D^{\keyword{invertible}}$ is well-formed if the inclusion has an *inverse.
+%\end{definition}
 
-Finally, we modify the definition of $\Exp{T}$ and $M(-)$ to add all implicitly imported identifiers:
+\paragraph{Using}
+We make a small modification to the rules in 
 
 \begin{definition}[Visible Declarations]
 The set $\flti{T}$ contains the following declarations:
@@ -166,20 +166,3 @@ $M$ is an (injective, surjective) \textbf{renaming} if the restriction of $M(-)$
 
 Clearly, if $m$ is an injective and surjective renaming, it is straightforward to obtain its inverse by inverting $M(-)$.
 
-\subsection{Applications}
-
-Canonical isomorphisms.
-
-User-declared atomic morphisms.
-
-\paragraph{Extending Theories from the Outside}
-
-\paragraph{Transparent Refactoring}
-A major drawback of OpenMath/\mmt-style qualified identifiers is that it can preclude transparent refactoring.
-For example, consider a theory $t=\{\icl{r},\icl{s}\}$ and assume we want to move a symbol $n$ from $r$ to $s$.
-This requires changing any qualified reference to $r?n$ (in any theory including $t$) to $s?n$.
-That can be very costly, especially in large libraries where the refactorer might not even know of or have write access to all theories importing $t$.
-
-With implicit morphisms, we rename $s$ to $s'$, move $n$ from $s'$ to $r$, and recover $s$ by $s=\{\icl{s'},n\}$.
-Now we can change define $t=\{\icl{r},\icl{s'}\}$ and give an implicit morphism from $s$ to $t$, which maps $s?n$ to $r?n$.
-All existing references to $s?n$ stay well-formed (and serve as aliases for $r?n$) so that no further changes in theories importing $t$ are needed.
