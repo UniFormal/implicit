@@ -99,6 +99,32 @@ In a theory declaration, each symbol \textbf{name} $n$ may be declared only once
 We omit the remaining productions for expressions here, which allow forming complex expressions using application, binding, variables, literals, etc.
 \end{definition}
 
+\begin{example}\label{ex:thgroup}
+The (flat) theory for $\cn{Group}$ and $\cn{DivGroup}$ as presented in the introduction are:
+\begin{mmtcode}
+theory Group : ?Meta =
+  universe	: type		❘ # U ❙
+  op		: U ⟶ U ⟶ U	❘ # 1 ∘ 2 ❙
+  unit		: U		❘ # e❙
+  inverse : U ⟶ U ❘  # 1 ⁻¹ ❙
+  
+  axiom_assoc		: ⊦ ∀[x]∀[y]∀[z] x ∘ (y ∘ z) ≐ (x ∘ y) ∘ z ❙
+  axiom_right_unit	: ⊦ ∀[x] x ∘ e ≐ x ❙
+  axiom_left_unit	: ⊦ ∀[x] e ∘ x ≐ x ❙
+  axiom_inverse : ⊦ ∀[x] x ∘ (x⁻¹) ≐ e ❙
+❚
+\end{mmtcode}
+\begin{mmtcode}
+theory DivisionGroup : ?Meta =
+  universe : type ❘ # U prec 1 ❙
+  div : U ⟶ U ⟶ U ❘ # 1 / 2 ❙
+  nonEmpty : U ❘ # e prec 1 ❙
+  // axioms ... ❙
+❚
+\end{mmtcode}
+where $\GS,\US,\RS$ are delimiters and the (optional) \lstinline|# <not>| is an optional notation. \lstinline|?Meta| is an intended meta-theory containing e.g. the symbols $\forall,\doteq$ etc.
+\end{example}
+
 At this point, this grammar only allows forming flat theories, i.e., $\Thy=\thy$.
 It is intentionally independent of the concrete choice of modularity principles, i.e., the kinds of module-structuring declarations (e.g., includes) and the module-expression-forming operators (e.g., union).
 But it already introduces all non-terminals for modularity: new declaration kinds for structured theories arise by adding production for the non-terminal $Dec$ and new theory expressions are formed by adding productions for the non-terminal $T$.
@@ -121,6 +147,21 @@ M      & m                               & \text{morphism expressions}
 \end{grammar}
 such that a morphism declaration contains exactly one assignment $c:=o$ for each $c\in\dom{S}$, all of which satisfying $o\in\Exp{T}$.
 \end{definition}
+
+\begin{example}
+	We can now specify the morphisms between our two definitions of groups. The theory of groups as monoids with inverses is given in \autoref{syn:incl}, the theory $\cn{DivGroup}$ and the morphism $\cn{DG2G}$ are as follows:
+\begin{mmtcode}
+view DG2G : ?DivisionGroup -> ?Group =
+  universe = universe ❙
+  div = [a,b] a ∘ (b⁻¹) ❙
+  nonEmpty = e ❙
+  // axioms ...❙
+❚
+\end{mmtcode}
+The morphism $\cn{DG2G}$ hence maps the universe of a division group to the universe of a group, division to the expression $\lambda a,b.\; a\circ b^{-1}$ and the witness $\cn{nonEmpty}$ of a division group to the unit $e$ of a group. Additionally, the view has to map the axioms of a division group to their \emph{proofs} in $\cn{Group}$ of their translated statements.
+
+The reverse morphism $\cn{G2DG}$ is completely analogous, mapping $\cn{op}$, $\cn{unit}$ and $\cn{inverse}$ to their corresponding definitions in terms of the division operation $\cn{div}$.
+\end{example}
 
 %Crucially, morphisms \textbf{preserve judgments}, in particular they map theorems to theorems.
 %Formally, an atomic morphism $m:S\to T$ is \emph{well-formed} if
@@ -150,6 +191,26 @@ We extend the grammar with
   Dec & \icl{S} & \text{include a theory into a theory} \\
   Ass & \icl{M} & \text{include a morphism into a morphism}
 \end{grammar}
+This allows writing the theory $\cn{Group}$ as in \autoref{ex:thgroup} by extending a theory of monoids:
+\begin{mmtcode}
+theory Monoid : ?Meta =
+  universe	: type		❘ # U ❙
+  op		: U ⟶ U ⟶ U	❘ # 1 ∘ 2 ❙
+  unit		: U		❘ # e❙
+  
+  axiom_assoc		: ⊦ ∀[x]∀[y]∀[z] x ∘ (y ∘ z) ≐ (x ∘ y) ∘ z ❙
+  axiom_right_unit	: ⊦ ∀[x] x ∘ e ≐ x ❙
+  axiom_left_unit	: ⊦ ∀[x] e ∘ x ≐ x ❙
+❚
+
+theory Group : ?Meta =
+  include ?Monoid ❙
+	
+  inverse : U ⟶ U ❘  # 1 ⁻¹ ❙
+  axiom_inverse : ⊦ ∀[x] x ∘ (x⁻¹) ≐ e ❙
+❚
+\end{mmtcode}
+The flat variant $\cn{Group}^\flat$ we get by making all included symbols (from $\cn{Monoid}$) available to $\cn{Group}$, resulting in exactly the theory as presented earlier in \autoref{ex:thgroup}.
 \end{example}
 
 \begin{example}[Union]\label{syn:union}
