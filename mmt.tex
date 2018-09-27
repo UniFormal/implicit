@@ -210,7 +210,6 @@ theory Group : ?Meta =
   axiom_inverse : ⊦ ∀[x] x ∘ (x⁻¹) ≐ e ❙
 ❚
 \end{mmtcode}
-The flat variant $\cn{Group}^\flat$ we get by making all included symbols (from $\cn{Monoid}$) available to $\cn{Group}$, resulting in exactly the theory as presented earlier in \autoref{ex:thgroup}.
 \end{example}
 
 \begin{example}[Union]\label{syn:union}
@@ -274,6 +273,8 @@ The situation is slightly more complicated for morphisms: if a morphism out of $
 Therefore, flattening and well-formedness must be distinguished:
   \[\fltd{\sigma}{\icl{M}} = \flt{M}\]
 under the condition $\flt{M}$ agrees with $\flt{\sigma}$ on any constant that is in the domain of both.
+
+The flat variant $\cn{Group}^\flat$ of our refactored theory $\cn{Group}$ from \autoref{syn:incl} is hence given by copying all included symbols (from $\cn{Monoid}$) over to $\cn{Group}$, resulting in exactly the theory as presented earlier in \autoref{ex:thgroup} except for global identifiers.
 \end{example}
 
 \begin{example}[Union (continued from Ex.~\ref{syn:union})]\label{sem:union}
