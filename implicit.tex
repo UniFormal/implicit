@@ -55,6 +55,18 @@ Specifically, the set $\IMo{S}{T}\sq\Mo{S}{T}$ of \textbf{implicit} morphisms co
  \item all declared morphisms $m:S\to T=\{\sigma\}$ whose declaration carries the attribute $\keyword{implicit}$.
 \end{itemize}
 
+\begin{example}\label{ex:dg2gimplicit}
+Going back to the morphism presented in \autoref{ex:dg2g}, we simply add the keyword \lstinline|implicit| in front, to declare it to be implicit:
+\begin{mmtcode}
+implicit view DG2G : ?DivisionGroup -> ?Group =
+  universe = universe ❙
+  div = [a,b] a ∘ (b⁻¹) ❙
+  nonEmpty = e ❙
+  // axioms ...❙
+❚
+\end{mmtcode}
+\end{example}
+
 \subsection{Semantics}
 
 We only have to make two minor changes to the semantics to accommodate implicit morphisms.
@@ -93,6 +105,10 @@ The map $M(-)$ maps every $c$ for which $\flt{M}$ does not provide an assignment
 This modification is conservative in the sense that $\flt{T}\sq\flti{T}$ and $\flti{T}\sm\flt{T}$ contains only declarations with definiens.
 Moreover, $\Exp{T}\sq\Expi{T}$ and $M(-)$ remains unchanged on all $o\in\Exp{T}$.
 It is easy to see that $M(-)$ still preserve all judgments.
+
+\begin{example}
+	For our morphism $\cn{DG2G}$ from \autoref{ex:dg2gimplicit}, this means that all symbols declared in the theory $\cn{DivisionGroup}$ (see \autoref{ex:thgroup}) are now visible in the theory $\cn{Group}$ with the definitions provided by $\cn{DG2G}$.
+\end{example}
 
 \subsection{Commutativity}\label{sec:commute}
 

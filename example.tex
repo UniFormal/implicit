@@ -1,0 +1,72 @@
+A good example for the usefulness of implicit morphisms is the lattice of \emph{bands}. A band is an idempotent semigroup. There are several varieties of bands which can all be defined by a single governing equation, resulting in the lattice in \autoref{fig:bands}.
+
+\begin{figure}\begin{center}
+\includegraphics[width=0.6\textwidth]{bands}\end{center}
+\caption{The Lattice of Varieties of Bands}\label{fig:bands}
+\end{figure}
+
+As the diagram suggests, even though each node in the lattice is definable via a single equation, each of them implies the connected equations above it. Hence formalizing the varieties of bands via includes would add the implied equations as \emph{additional axioms}, even though they are provable.
+
+Using implict morphisms between the varieties however can turn the axiom in a variety of bands into a theorem in another variety. \autoref{fig:bandsmmt} shows a subset of this lattice implemented with implict morphisms.
+
+\begin{figure}
+\begin{tabular}{c|c}
+\begin{mmtcode}
+theory Band : ?Meta =
+  include ?SemiGroup ❙	
+  axiom_idemp : ⊦ ∀[x] x ∘ x ≐ x ❙
+❚
+
+theory Regular : ?Meta =
+  include ?Band ❙
+  axiom_regular : ⊦ ∀[x]∀[y]∀[z] 
+    z ∘ x ∘ z ∘ y ∘ z ≐ z ∘ x ∘ y ∘ z ❙
+❚
+
+theory LeftNormal : ?Meta =
+  include ?Band ❙
+  axiom_leftnormal : ⊦ ∀[x]∀[y]∀[z] 
+    z ∘ x ∘ z ∘ y ≐ z ∘ x ∘ y ❙ 
+❚
+
+theory RightNormal : ?Meta =
+  include ?Band ❙
+  axiom_rightnormal : ⊦ ∀[x]∀[y]∀[z] 
+    y ∘ z ∘ x ∘ z ≐ y ∘ x ∘ z ❙ 
+❚
+
+theory Normal : ?Meta =
+  include ?Band ❙
+  axiom_normal :  ⊦ ∀[x]∀[y]∀[z] 
+    z ∘ x ∘ y ∘ z ≐ z ∘ y ∘ x ∘ z ❙
+❚
+\end{mmtcode} &
+\begin{mmtcode}
+implicit view Reg2LeftNormal : 
+    ?Regular -> ?LeftNormal =
+  include ?Band = ?Band ❙
+  axiom_regular = sketch "trivial" ❙
+❚
+
+implicit view Reg2RightNormal : 
+    ?Regular -> ?RightNormal =
+  include ?Band = ?Band ❙
+  axiom_regular = sketch "trivial" ❙
+❚
+
+implicit view LeftNormal2Normal : 
+    ?LeftNormal -> ?Normal =
+  include ?Band = ?Band ❙
+  axiom_leftnormal = sketch "trivial" ❙
+❚
+
+implicit view RightNormal2Normal : 
+    ?RightNormal -> ?Normal =
+  include ?Band = ?Band ❙
+  axiom_rightnormal = sketch "trivial" ❙
+❚
+\end{mmtcode}
+\end{tabular}
+
+\caption{Exemplary Theories for Some Varieties of Bands}\label{fig:bandsmmt}
+\end{figure}
