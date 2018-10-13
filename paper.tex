@@ -3,9 +3,11 @@
 \usepackage{graphicx,url,wrapfig,amsmath,amssymb}
 
 \usepackage{comment}
+% flip these to add module expressions; if so, some manual changes to intro and grammars are also necessary
 \excludecomment{modexp}
-\excludecomment{union}
 \includecomment{nomodexp}
+% include unions as an example of module expressions
+\excludecomment{union}
 
 \usepackage[show]{ed} %for ednotes
 
@@ -49,17 +51,13 @@ The practical appeal of implicit morphisms is that they hit the sweet-spot of be
 \section{Implicit Morphisms}
 \input{implicit}
 
-%\section{Applications}
-%\input{appl}
+\section{Applications}
+\input{appl}
 
-\section{Extended Example}
-\input{example}
-
-%\section{Complex Theories and Morphisms}\label{sec:complex}
-%\input{complex}
-
-\section{Related Work}
-\input{related}
+\begin{modexp}
+\section{Advanced Module Expressions}\label{sec:complex}
+\input{complex}
+\end{modexp}
 
 \section{Conclusion}
 \input{conc}

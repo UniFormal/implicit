@@ -1,11 +1,51 @@
-\paragraph{Extending Theories from the Outside}
+\subsection{Related Work}
 
-\paragraph{Transparent Refactoring}
-A major drawback of OpenMath/\mmt-style qualified identifiers is that it can preclude transparent refactoring.
-For example, consider a theory $t=\{\icl{r},\icl{s}\}$ and assume we want to move a symbol $n$ from $r$ to $s$.
-This requires changing any qualified reference to $r?n$ (in any theory including $t$) to $s?n$.
-That can be very costly, especially in large libraries where the refactorer might not even know of or have write access to all theories importing $t$.
+\ednote{finish}
 
-With implicit morphisms, we rename $s$ to $s'$, move $n$ from $s'$ to $r$, and recover $s$ by $s=\{\icl{s'},n\}$.
-Now we can change define $t=\{\icl{r},\icl{s'}\}$ and give an implicit morphism from $s$ to $t$, which maps $s?n$ to $r?n$.
-All existing references to $s?n$ stay well-formed (and serve as aliases for $r?n$) so that no further changes in theories importing $t$ are needed.
+\cite{realms} defines a realm (essentially) as a certain cluster of theories:
+\begin{compactitem}
+\item a set of isomorphic theories $B_1,\ldots,$
+\item for each $B_i$, a set of retractable extensions $E^i_1,\ldots,$
+\item a theory $F$ including all of the above.
+\end{compactitem}
+The intuition is that the $B_i$ are alternative definitions of a theory; the $E^i_j$ add definitions and theorems; and $F$ aggregates everything into the outwardly visible interface (the face) of the realm.
+
+A good example is the realm of topological spaces with the $B_i$ corresponding to the various possible definitions (via neighborhoods, open sets, closure operator, etc.).
+
+Users of the realm include only the face and thus (i) gain access to all derived knowledge in the theory of topological spaces, and (ii) do not have to commit to one particular definition.
+Indeed, this corresponds more closely to the way how conventional mathematics sees the theory of topological spaces.
+
+\cite{realms} calls for an implementation of realms as a new primitive concept in addition to theories and morphisms.
+However, in the presence of implicit morphisms, we do not need it: All we have to do is to designate the isomorphisms and the retraction is implicit and include any one of the $B_i$ into $F$.
+
+\paragraph{Canonical Structures Coq}
+\cite{gonthier_packaging}
+
+\paragraph{Type Classes}
+unnamed implict conversions, uniqueness problem does not arise
+
+\paragraph{Implicit Conversions in Scala}
+The Scala programming language \cite{scala} has a clean implementation of implicit conversions between any two types.
+If we think of functions between classes as theory morphisms, this corresponds to implicit theory morphisms.
+
+Contrary to \mmt, a conversion is only available if explicitly imported into the current namespace.
+Moreover, Scala does not chain conversions, i.e, the composition of implicit morphisms is not implicit.
+Scala's limitations are intentional: Their goal is to prevent programmers from overusing implicit conversions because that can be very confusing to readers.
+
+These limitations are lifted in \mmt's conversions can only act between theories anyway.
+Thus, their potential to confuse is smaller.
+Moreover, the use of qualified identifiers in \mmt means that readers can always tell where an identifier is implicitly-included from, and the \mmt IDE can always show the implicit morphism along which it is imported.
+
+\subsection{Future Work}
+
+\ednote{finish}
+
+build big library, necessary to investigate scoping problem
+
+\paragraph{Scoping}
+drawback: global data structure
+
+problem in big libraries?
+
+We anticipate that this will result in an evolution of our solution that allows more localized control over which morphisms are implicit.
+But we defer this until the current implementation has been used to conduct very large case studies.

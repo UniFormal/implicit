@@ -260,7 +260,7 @@ For the base case, of a theory $t=\{\Sigma\}$, we define $\flt{t}$ by induction 
 where
  \[\flt{\cdot}=\es\]
  \[\flt{(\Sigma,D)}=\flt{\Sigma}\cup\fltd{\flt{\Sigma}}{D}\]
-Here $\fltd{T}{D}$ is the flattening of declaration $d$ in the context of theory $T$.
+Here $\fltd{T}{D}$ is the flattening of declaration $d$ relative to $\flt{\Sigma}$.
 
 At this point, we only have one case for declarations $D$, namely constant declarations.
 Their flattening is trivial:
@@ -295,7 +295,7 @@ Therefore, flattening and well-formedness must be distinguished:
   \[\fltd{\sigma}{(\icl{M})} = \flt{M}\]
 under the condition $\flt{M}$ agrees with $\flt{\sigma}$ on any constant that is in the domain of both.
 
-The flat variant $\cn{Group}^\flat$ of our refactored theory $\cn{Group}$ from \autoref{syn:incl} is hence given by copying all included symbols (from $\cn{Monoid}$) over to $\cn{Group}$, resulting in exactly the theory as presented earlier in \autoref{ex:thgroup} except for global identifiers from $\cn{Monoid}$ -- i.e. the prefixes $t$ in $t?n$.
+The flat variant $\cn{Group}^\flat$ of our refactored theory $\cn{Group}$ from Ex.~\ref{syn:incl} is hence given by copying all included symbols (from $\cn{Monoid}$) over to $\cn{Group}$, resulting in exactly the theory as presented earlier in \autoref{ex:thgroup} except for global identifiers from $\cn{Monoid}$ -- i.e. the prefixes $t$ in $t?n$.
 \end{example}
 
 \begin{union}

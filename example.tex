@@ -1,72 +1,94 @@
-A good example for the usefulness of implicit morphisms is the lattice of \emph{bands}. A band is an idempotent semigroup. There are several varieties of bands which can all be defined by a single governing equation, resulting in the lattice in \autoref{fig:bands}.
+A common problem when definition modular theory hierarchies is that the most natural include-hierarchy for the most important theories is not necessarily the same as the most comprehensive hierarchy.
+For example, Ex.~\ref{syn:incl} defines \cn{Group} with an include from \cn{Monoid}.
+Instead, we could include \cn{Monoid} into the the intermediate theory \cn{CancellationMonoid} and include that into \cn{Group}.
+This change is not possible in retrospect --- changing the theory hierarchy (which is one of the most fundamental structures of a library) usually presents an insurmountable refactoring problem.
+So instead we could systematically build a hierarchy that uses every intermediate theory (as done in \cite{mathscheme}).
+But this yields a very deep and complex hierarchy that is hard to navigate for casual users.
+Moreover, it does not protect us from later on discovering yet another intermediate theory that should have been added.
+
+Implicit morphisms provide a simple solution to this problem because they behave effectively like inclusions but can be added later on.
+In the above example, we would
+\begin{compactitem}
+ \item define \cn{CancellationMonoid} with an include from \cn{Monoid},
+ \item keep \cn{Group} as it is, i.e., also with an include \cn{Monoid},
+ \item add an implicit morphism $\cn{CancellationMonoid}\to\cn{Group}$.
+\end{compactitem}
+
+In the sequel, we develop a similar, more complex example: we build a hierarchy of theories between \cn{Band} and \cn{Semilattice}.
+\ednote{@DM: this is not quite the lattice from the Wikipedia page: it consists of the 3x3 square plus Bands at the top}
+All of these theories are of the form $t=\{\icl{\cn{Band}},\,a:\vdash F\}$, where $F$ is a universally quantified equational axiom.\footnote{All varieties of bands can be axiomatized in this way.}
+In particular, $\cn{SemiLattice}=\{\icl{\cn{Band}},\,a:\vdash \forall [x]\forall [y] x\circ y\doteq y\circ x\}$.
+Fig.~\ref{fig:bands} shows these theories.
+
+There are various morphisms between them that describe the lattice structure of the corresponding varieties of bands.
+All of these map the constants from \cn{Band} to themselves and the axiom $a$ to a proof.\ednote{@DM: no need to give the morphisms, but link to the online resource if you have time to work them all out}
+We make all of these morphisms implicit.
+It is straightforward to prove that the diagram commutes: any two morphisms are identical except for assignment for the axiom.
+Here, \mmt can discharge the proof obligation easily using proof irrelevance.
 
 \begin{figure}\begin{center}
 \includegraphics[width=0.6\textwidth]{bands}\end{center}
 \caption{The Lattice of Varieties of Bands}\label{fig:bands}
 \end{figure}
 
-As the diagram suggests, even though each node in the lattice is definable via a single equation, each of them implies the connected equations above it. Hence formalizing the varieties of bands via includes would add the implied equations as \emph{additional axioms}, even though they are provable.
-
-Using implict morphisms between the varieties however can turn the axiom in a variety of bands into a theorem in another variety. \autoref{fig:bandsmmt} shows a subset of this lattice implemented with implict morphisms.
-
-\begin{figure}
-\begin{tabular}{c|c}
-\begin{mmtcode}
-theory Band : ?Meta =
-  include ?SemiGroup ❙	
-  axiom_idemp : ⊦ ∀[x] x ∘ x ≐ x ❙
-❚
-
-theory Regular : ?Meta =
-  include ?Band ❙
-  axiom_regular : ⊦ ∀[x]∀[y]∀[z] 
-    z ∘ x ∘ z ∘ y ∘ z ≐ z ∘ x ∘ y ∘ z ❙
-❚
-
-theory LeftNormal : ?Meta =
-  include ?Band ❙
-  axiom_leftnormal : ⊦ ∀[x]∀[y]∀[z] 
-    z ∘ x ∘ z ∘ y ≐ z ∘ x ∘ y ❙ 
-❚
-
-theory RightNormal : ?Meta =
-  include ?Band ❙
-  axiom_rightnormal : ⊦ ∀[x]∀[y]∀[z] 
-    y ∘ z ∘ x ∘ z ≐ y ∘ x ∘ z ❙ 
-❚
-
-theory Normal : ?Meta =
-  include ?Band ❙
-  axiom_normal :  ⊦ ∀[x]∀[y]∀[z] 
-    z ∘ x ∘ y ∘ z ≐ z ∘ y ∘ x ∘ z ❙
-❚
-\end{mmtcode} &
-\begin{mmtcode}
-implicit view Reg2LeftNormal : 
-    ?Regular -> ?LeftNormal =
-  include ?Band = ?Band ❙
-  axiom_regular = sketch "trivial" ❙
-❚
-
-implicit view Reg2RightNormal : 
-    ?Regular -> ?RightNormal =
-  include ?Band = ?Band ❙
-  axiom_regular = sketch "trivial" ❙
-❚
-
-implicit view LeftNormal2Normal : 
-    ?LeftNormal -> ?Normal =
-  include ?Band = ?Band ❙
-  axiom_leftnormal = sketch "trivial" ❙
-❚
-
-implicit view RightNormal2Normal : 
-    ?RightNormal -> ?Normal =
-  include ?Band = ?Band ❙
-  axiom_rightnormal = sketch "trivial" ❙
-❚
-\end{mmtcode}
-\end{tabular}
-
-\caption{Exemplary Theories for Some Varieties of Bands}\label{fig:bandsmmt}
-\end{figure}
+%
+%\begin{figure}
+%\begin{tabular}{c|c}
+%\begin{mmtcode}
+%Band =
+%  include ?SemiGroup
+%  axiom_idemp : ⊦ ∀[x] x ∘ x ≐ x
+%❚
+%
+%Regular =
+%  include ?Band
+%  axiom_regular : ⊦ ∀[x]∀[y]∀[z] 
+%    z ∘ x ∘ z ∘ y ∘ z ≐ z ∘ x ∘ y ∘ z
+%❚
+%
+%LeftNormal =
+%  include ?Band
+%  axiom_leftnormal : ⊦ ∀[x]∀[y]∀[z] 
+%    z ∘ x ∘ z ∘ y ≐ z ∘ x ∘ y
+%
+%theory RightNormal =
+%  include ?Band ❙
+%  axiom_rightnormal : ⊦ ∀[x]∀[y]∀[z] 
+%    y ∘ z ∘ x ∘ z ≐ y ∘ x ∘ z ❙ 
+%❚
+%
+%theory Normal : ?Meta =
+%  include ?Band ❙
+%  axiom_normal :  ⊦ ∀[x]∀[y]∀[z] 
+%    z ∘ x ∘ y ∘ z ≐ z ∘ y ∘ x ∘ z ❙
+%❚
+%\end{mmtcode} &
+%\begin{mmtcode}
+%implicit view Reg2LeftNormal : 
+%    ?Regular -> ?LeftNormal =
+%  include ?Band = ?Band ❙
+%  axiom_regular = sketch "trivial" ❙
+%❚
+%
+%implicit view Reg2RightNormal : 
+%    ?Regular -> ?RightNormal =
+%  include ?Band = ?Band ❙
+%  axiom_regular = sketch "trivial" ❙
+%❚
+%
+%implicit view LeftNormal2Normal : 
+%    ?LeftNormal -> ?Normal =
+%  include ?Band = ?Band ❙
+%  axiom_leftnormal = sketch "trivial" ❙
+%❚
+%
+%implicit view RightNormal2Normal : 
+%    ?RightNormal -> ?Normal =
+%  include ?Band = ?Band ❙
+%  axiom_rightnormal = sketch "trivial" ❙
+%❚
+%\end{mmtcode}
+%\end{tabular}
+%
+%\caption{Exemplary Theories for Some Varieties of Bands}\label{fig:bandsmmt}
+%\end{figure}
