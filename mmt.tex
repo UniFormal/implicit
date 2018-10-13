@@ -21,8 +21,8 @@ Building large morphism is as important as building large theories: for example,
 \paragraph{Flat Modules}
 \mmt provides formal syntax for both structured modules and module expressions and defines their semantics via \textbf{flattening}, which defines for every module $M$ a flat module $\flt{M}$.
 
-\textbf{Flat theories} are lists of declarations $c[:E][=e]$ where $E$ and $e$ are optional expressions.
-We write $\dom{T}$ for the set of constant identifiers $c$ in $\flt{T}$ and $\Exp{T}$ for the set of closed expressions using only the symbols $c\in\dom{T}$.
+\textbf{Flat theories} are lists of declarations $c:E[=e]$ where $E$ and $e$ are expression, and the latter is optional.
+We write $\dom{T}$ for the set of constant identifiers $c$ in $\flt{T}$ and $\Exp{T}$ for the set of closed expressions using only the symbols $c\in\dom{T}$ (see below for the definition of well-formed expressions).
 Constant declarations subsume virtually all basic declarations common in formal systems such as type/function/predicate symbols, axioms, theorems, inference rules, etc.
 In particular, theorems can be represented via the propositions-as-types correspondence as declarations $c:F=P$, which establish theorem $F$ via proof $P$.
 Similarly, \mmt expressions subsume virtually all objects common in formal systems such as terms, types, formulas, proofs.
@@ -53,25 +53,31 @@ Then flattening assigns
  \item to each $M\in\Mo{S}{T}$ the morphism $\flt{M}$ from $\flt{S}$ to $\flt{T}$.
 \end{compactitem}
 
-\paragraph{Well-Formedness}
-The inference system to define well-formed modules, and expressions is not a primary interest of this paper.
-Therefore, we only mention those aspects that are relevant later on.
+\paragraph{Well-Formed Expressions}
+The inference system to define well-formed expressions is not a primary interest of this paper.
+Intuitively, the set $\Exp{T}$ of expressions over $T$ includes all syntax trees that can be formed using the constants from $\flt{T}$.
+Moreover, well-formed modules may only use expressions that satisfy certain typing and equality judgments.
+We refer to \cite{rabe:howto:14} for details.
 
-However, one detail will be critical later on:
-the inference rules for the well-formedness of expressions include the following base case for constants:
-\[\rul{c:E[=e] \minn \flt{T}}{\vdash_T c:E} \tb \rul{c[:E]=e \minn \flt{T}}{\vdash_T c=e}\]
-Correspondingly, the definition of the homomorphic extension of a morphism includes the following base case for constants:
-\[M(c) = e \mwhere c:= e\in\flt{M}\]
+The only aspect of the inference system for these judgments that is relevant to our purposes here is the rules for constants:
+\[\rul{c:E[=e] \minn \flt{T}}{\vdash_T c[=e]:E}\]
+Here, in order to avoid case distinctions for the case where a definition is present or not, we use a combined typing+equality judgment: $e_1=e_2:E$ represents the conjunction of $e_1:E$, $e_2:E$, and $e_1=e_2$.
+Correspondingly, the definition of the homomorphic extension of a morphism with domain $S$ includes the following case for constants:
+\[M(c) = \cas{e\mifc (c:E) \in \flt{S}, (c:=e)\in\flt{M} \\ M(e) \mifc (c:E=e)\in \flt{S}}\]
+Here if $c$ has a definiens in $S$, we expand it before applying $M$.%
+\footnote{The \mmt tool also $c:e\in \flt{M}$ even if $(c:E=e')\in\flt{S}$ has a definition. In that case, \mmt checks $\vdash_T M(e')=e$ and puts $M(c)=e$. This is important for efficiency but not essential for our purposes here.}
 
-These base cases introduce a mutual recursion between well-formedness and flattening:
+Note that these base cases introduce a mutual recursion between well-formedness and flattening:
 the well-formedness of a declaration in a theory depends on the flattening of all preceding declarations;
-and the well-formedness of an assignment in a morphism depends on the homomorphic extension of the morphism obtained by flattening of all preceding assignments.
-Vice versa, well-formedness is a precondition for defining the flattening.
-It is desirable to define well-formedness independently of flattening.
-But the mutual recursion makes sense from an implementation perspective: typical tools for formal systems will first parse, check, and flatten the first declaration, then continue with the next declaration.
-In fact, often the checking of well-formedness is as expensive as flattening anyway.
+correspondingly, the well-formedness of an assignment in a morphism depends on the homomorphic extension of the morphism obtained by flattening of all preceding assignments.
+Vice versa, well-formedness is a precondition for defining the flattening --- the definition of flattening may become nonsensical if applied to ill-formed modules.
 
-Therefore, we will make flattening a partial function, i.e., $\flt{X}$ is defined iff the module $X$ is well-formed. 
+It is desirable to define well-formedness independently of flattening.
+But the mutual recursion makes sense from an implementation perspective: typical tools for formal systems first parse, check, and flatten a declaration entirely before moving on to the next declaration.
+Moreover, often the checking of well-formedness is as difficult or expensive as flattening anyway.
+In fact, inspecting practical systems with modular features (which often do not have a full rigorous formal specification) shows that our definition elegantly captures the essential commonalities between them.
+
+Therefore, we will make flattening a partial function, i.e., $\flt{X}$ is undefined if the module $X$ is not well-formed. 
 
 %Consider any declaration $n[:E][=e]$ in the body of a theory $t$.
 %It is well-formed if $n$ is a fresh name $E$ and $e$ are well-formed expressions over $t$.
@@ -81,6 +87,9 @@ Therefore, we will make flattening a partial function, i.e., $\flt{X}$ is define
 %Similarly, consider an assignment $c:=e$ in a morphism $m$ from $S$ to $T$, where $c:E$ is a declaration is $S$.
 %It is well-formed if $\vdash_T e:\flt{m}(E)$.
 
+\paragraph{Logics in \mmt}
+\ednote{explain that we use a fixed instance of MMT which adds LF and FOL; only relevant for examples}
+
 \subsection{Syntax}
 
 We start with the syntax for theories (which arises as a special case of the one given in \cite{RK:mmt:10}):
@@ -89,7 +98,7 @@ We start with the syntax for theories (which arises as a special case of the one
 A \textbf{theory} $T$ is of the form
 \begin{grammar}
 TDec     & t=\{Dec,\ldots,Dec\}  & \text{theory declaration} \\
-Dec      & n\opt{:o}\opt{=o}     & \text{constant declaration}\\
+Dec      & n:o\opt{=o}           & \text{constant declaration}\\
 c        & t?n                   & \text{qualified constant identifiers} \\
 o        & c \alt \ldots         & \text{expressions built from constants} \\
 T        & t                     & \text{theory expressions}
@@ -100,29 +109,29 @@ We omit the remaining productions for expressions here, which allow forming comp
 \end{definition}
 
 \begin{example}\label{ex:thgroup}
-The (flat) theory for $\cn{Group}$ and $\cn{DivGroup}$ as presented in the introduction are:
+The (flat) theories $\cn{Group}$ and $\cn{DivGroup}$ from the introduction are:
 \begin{mmtcode}
-theory Group : ?Meta =
-  universe	: type		❘ # U ❙
-  op		: U ⟶ U ⟶ U	❘ # 1 ∘ 2 ❙
-  unit		: U		❘ # e❙
-  inverse : U ⟶ U ❘  # 1 ⁻¹ ❙
+Group =
+  universe	: type	 # U
+  op		: U ⟶ U ⟶ U	 # 1 ∘ 2 
+  unit		: U
+  inverse : U ⟶ U   # 1 ⁻¹ 
   
-  axiom_assoc		: ⊦ ∀[x]∀[y]∀[z] x ∘ (y ∘ z) ≐ (x ∘ y) ∘ z ❙
-  axiom_right_unit	: ⊦ ∀[x] x ∘ e ≐ x ❙
-  axiom_left_unit	: ⊦ ∀[x] e ∘ x ≐ x ❙
-  axiom_inverse : ⊦ ∀[x] x ∘ (x⁻¹) ≐ e ❙
-❚
+  axiom_assoc		: ⊦ ∀[x]∀[y]∀[z] x ∘ (y ∘ z) ≐ (x ∘ y) ∘ z 
+  axiom_right_unit	: ⊦ ∀[x] x ∘ unit ≐ x 
+  axiom_left_unit	: ⊦ ∀[x] unit ∘ x ≐ x 
+  axiom_inverse : ⊦ ∀[x] x ∘ (x⁻¹) ≐ unit
 \end{mmtcode}
 \begin{mmtcode}
-theory DivisionGroup : ?Meta =
-  universe : type ❘ # U prec 1 ❙
-  div : U ⟶ U ⟶ U ❘ # 1 / 2 ❙
-  nonEmpty : U ❘ # e prec 1 ❙
-  // axioms ... ❙
-❚
+DivisionGroup =
+  universe : type  # U prec 1 
+  div : U ⟶ U ⟶ U  # 1 / 2 
+  unit : U  # e prec 1 
+  // axioms ... 
 \end{mmtcode}
-where $\GS,\US,\RS$ are delimiters and the \lstinline|# <not>| components are (optional) notations. \lstinline|?Meta| is an intended meta-theory containing e.g. the symbols $\forall,\doteq$ etc.
+Here we use \lstinline|# <not>| to indicate notations; these are part of the language supported by \mmt but omitted from the formal grammar above because we only need them here to present legible examples.
+
+Moreover, we use a few constants from a type systems\ednote{finish}$\forall,\doteq$ etc.
 \end{example}
 
 At this point, this grammar only allows forming flat theories, i.e., $\Thy=\thy$.
@@ -151,12 +160,11 @@ such that a morphism declaration contains exactly one assignment $c:=o$ for each
 \begin{example}\label{ex:dg2g}
 	We can now specify the morphisms between our two definitions of groups. The theory of groups as monoids with inverses is given in \autoref{syn:incl}, the theory $\cn{DivGroup}$ and the morphism $\cn{DG2G}$ are as follows:
 \begin{mmtcode}
-view DG2G : ?DivisionGroup -> ?Group =
-  universe = universe ❙
-  div = [a,b] a ∘ (b⁻¹) ❙
-  nonEmpty = e ❙
-  // axioms ...❙
-❚
+DG2G : DivisionGroup -> Group =
+  universe = universe 
+  div = [a,b] a ∘ (b⁻¹) 
+  unit = unit
+  // axioms ...
 \end{mmtcode}
 The morphism $\cn{DG2G}$ hence maps the universe of a division group to the universe of a group, division to the expression $\lambda a,b.\; a\circ b^{-1}$ and the witness $\cn{nonEmpty}$ of a division group to the unit $e$ of a group. Additionally, the view has to map the axioms of a division group to their \emph{proofs} in $\cn{Group}$ of their translated statements.
 
@@ -193,22 +201,18 @@ We extend the grammar with
 \end{grammar}
 This allows writing the theory $\cn{Group}$ as in \autoref{ex:thgroup} by extending a theory of monoids:
 \begin{mmtcode}
-theory Monoid : ?Meta =
-  universe	: type		❘ # U ❙
-  op		: U ⟶ U ⟶ U	❘ # 1 ∘ 2 ❙
-  unit		: U		❘ # e❙
-  
-  axiom_assoc		: ⊦ ∀[x]∀[y]∀[z] x ∘ (y ∘ z) ≐ (x ∘ y) ∘ z ❙
-  axiom_right_unit	: ⊦ ∀[x] x ∘ e ≐ x ❙
-  axiom_left_unit	: ⊦ ∀[x] e ∘ x ≐ x ❙
-❚
+Monoid =
+  universe	: type		 # U 
+  op		: U ⟶ U ⟶ U	 # 1 ∘ 2 
+  unit		: U
+  axiom_assoc		: ⊦ ∀[x]∀[y]∀[z] x ∘ (y ∘ z) ≐ (x ∘ y) ∘ z 
+  axiom_right_unit	: ⊦ ∀[x] x ∘ unit ≐ x 
+  axiom_left_unit	: ⊦ ∀[x] unit ∘ x ≐ x 
 
-theory Group : ?Meta =
-  include ?Monoid ❙
-	
-  inverse : U ⟶ U ❘  # 1 ⁻¹ ❙
-  axiom_inverse : ⊦ ∀[x] x ∘ (x⁻¹) ≐ e ❙
-❚
+Group =
+  include Monoid
+  inverse : U ⟶ U   # 1 ⁻¹ 
+  axiom_inverse : ⊦ ∀[x] x ∘ (x⁻¹) ≐ unit
 \end{mmtcode}
 \end{example}
 
@@ -250,14 +254,14 @@ Here $\fltd{T}{D}$ is the flattening of declaration $d$ in the context of theory
 
 At this point, we only have one case for declarations $D$, namely constant declarations.
 Their flattening is trivial:
- \[\fltd{\Sigma}{n[:E][=e]}=\{t?n[:E][=e]\}\]
+ \[\fltd{\Sigma}{n:E[=e]}=\{t?n:E[=e]\}\]
 where $t$ is the name of the containing theory.
 
 Correspondingly, for a declared morphism $m:S\to T=\{\sigma\}$, we have $m\in\Mo{S}{T}$ and $\flt{m}$ is defined by induction on the assignments in $\sigma$:
  \[\flt{\cdot}=\es\]
  \[\flt{(\sigma,\;A)}=\flt{\sigma}\cup\fltd{\flt{\sigma}}{A}\]
 with the trivial base case
- \[\fltd{\sigma}{c:=e}=\{c:=o\}\]
+ \[\fltd{\sigma}{c:=e}=\{c:=e\}\]
 
 \begin{example}[Includes (continued from Ex.~\ref{syn:incl})]\label{sem:incl}
 Includes add new declarations $D$, so we have to add cases to the definition of $\fltd{\Sigma}{D}$.
@@ -291,10 +295,12 @@ In that case, we put
 Finally, we define the semantics of the category structure:
 \begin{example}[Category of Theories (continued from Ex.~\ref{syn:cat})]\label{sem:cat}
 For $T\in\Thy$, we put $\id{T}\in\Mo{T}{T}$ and define
-\[\flt{\id{T}}=\{c:=c \;|\; c\in\dom{\flt{T}}\}\]
+\[\flt{\id{T}}=\{c:=c \;|\; c:E\in\dom{\flt{T}}\}\]
 
 For $R,S,T\in\Thy$ and $M\in\Mo{R}{S}$ and $N\in\Mo{S}{T}$, we put $M;N\in\Mo{R}{T}$ and define
-\[\flt{M;N}=\{c:=\flt{N}(\flt{M}(c)) \;|\; c\in\dom{\flt{R}}\}\]
+\[\flt{M;N}=\{c:=\flt{N}(\flt{M}(c)) \;|\; c:E\in\dom{\flt{R}}\}\]
+
+Note that in both cases, we only have to consider constants $c:E$ without definiens.
 \end{example}
 
 %Includes between theories are always well-formed (assuming the included theory is).

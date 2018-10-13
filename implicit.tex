@@ -46,14 +46,7 @@ Att    & \keyword{implicit} \alt \ldots & \text{attributes}
 \end{grammar}
 
 The set of attributes is itself extensible, and the above grammar only list the one that we use to get started.
-Additional attributes may be added with the condition that any additional attribute increases the set of implicit morphisms.
-
-Specifically, the set $\IMo{S}{T}\sq\Mo{S}{T}$ of \textbf{implicit} morphisms contains the following elements:
-\begin{itemize}
- \item all identity morphisms $\id{T}$,
- \item all compositions $M;N$ of implicit morphisms $M$ and $N$,
- \item all declared morphisms $m:S\to T=\{\sigma\}$ whose declaration carries the attribute $\keyword{implicit}$.
-\end{itemize}
+Additional attributes can be added when adding modularity principles.
 
 \begin{example}\label{ex:dg2gimplicit}
 Going back to the morphism presented in \autoref{ex:dg2g}, we simply add the keyword \lstinline|implicit| in front, to declare it to be implicit:
@@ -72,113 +65,257 @@ implicit view DG2G : ?DivisionGroup -> ?Group =
 We only have to make two minor changes to the semantics to accommodate implicit morphisms.
 The first change govern how we obtain implicit morphisms, the second one how we use them.
 
-\paragraph{Obtaining}
-We define well-formedness for our extended syntax.
-We define that an attribute to a declaration is only well-formed if the category of implicit morphisms remains thin, i.e., for any two theories, there may be only one (up to equality) implicit morphism between them.
-In other the diagram containing only the implicit morphisms must commute.
+\paragraph{Obtaining Implicit Morphisms}
+Based on the above attributes, we define the set $\IMo{S}{T}\sq\Mo{S}{T}$ of \textbf{implicit} morphisms to contain the following elements:
+\begin{itemize}
+ \item all declared morphisms $m:S\to T=\{\sigma\}$ whose declaration carries the attribute $\keyword{implicit}$,
+ \item all morphisms that additional modularity principles designate as implicit based on the use of additional attributes.
+\end{itemize}
 
+To define well-formedness for our extended syntax, we say that adding an attribute to a declaration is only well-formed if there is (up to equality of morphisms) at most one implicit morphism for any pair of theories, i.e., $\IMo{S}{T}$ has cardinality $0$ or $1$.
 Depending on what modularity principles we add, equality of morphisms may or may not be decidable.
-Therefore, in the general case, implementations may have to employ sound but incomplete criteria for commutativity (see Sect.~\ref{sec:commute}).
+Therefore, in the general case, implementations may have to employ sound but incomplete criteria for equality (see Sect.~\ref{sec:commute}).
 
-%\begin{definition}[Well-Formedness]
-%Consider a well-formed diagram $D, m:S\to T=\{\sigma\}$.
-%Let $D^a$ be $D, a\; m:S\to T=\{\sigma\}$.
-%$D^{\keyword{implicit}}$ is well-formed if $D^i$ extended with an edge for $m$ commutes.
-%$D^{\keyword{invertible}}$ is well-formed if $D^i$ extended with edges for $m$ and its inverse commutes.
-%
-%Correspondingly, consider a well-formed diagram $D$ of the form $D_0, T=\{\ldots,\icl{S},\ldots\}$.
-%Let $D^a$ be $D_0, T=\{\ldots, a\; \icl{S},\ldots\}$.
-%$D^{\keyword{invertible}}$ is well-formed if the inclusion has an *inverse.
-%\end{definition}
+The following example phrases the restriction on implicit morphisms in categorical terms:
 
-\paragraph{Using}
-We make a small modification to the rules in 
+\begin{example}[Category of Theories and Implicit Morphisms (continued from Ex.~\ref{sem:cat})]\label{impl:cat}
+We define the following morphisms are implicit:
+\begin{compactitem}
+ \item all identity morphisms $\id{T}$,
+ \item all compositions $M;N$ of implicit morphisms $M$ and $N$.
+\end{compactitem}
 
-\begin{definition}[Visible Declarations]
-The set $\flti{T}$ contains the following declarations:
-for every $\ipc{M}{S}{T}$ and every $c[:t][=d]$ in $\flt{S}$, the declaration $c[:M(t)]=M(c)$.
+Thus, the implicit morphisms form a thin broad subcategory of theories and morphisms.
+In other words, the implicit morphisms form commutative diagram.
+\end{example}
 
-The set $\Expi{T}$ contains all objects formed from the symbols in $\flti{T}$.
-The map $M(-)$ maps every $c$ for which $\flt{M}$ does not provide an assignment to $M(d)$ where $d$ is the definiens of $c$.
-\end{definition}
+\begin{example}[Includes (continued from Ex.~\ref{sem:incl})]\label{impl:incl}
+For include morphism, we add the following definition: if theory $t$ contains the declaration $\icl{S}$, then the induced morphism from $S$ to $t$ is implicit.
 
-This modification is conservative in the sense that $\flt{T}\sq\flti{T}$ and $\flti{T}\sm\flt{T}$ contains only declarations with definiens.
-Moreover, $\Exp{T}\sq\Expi{T}$ and $M(-)$ remains unchanged on all $o\in\Exp{T}$.
-It is easy to see that $M(-)$ still preserve all judgments.
+Combined with composition morphisms, we see that all transitive includes between theories are implicit.
+That corresponds to the intuition that anything that is include should be available directly.
+\end{example}
 
 \begin{example}
 	For our morphism $\cn{DG2G}$ from \autoref{ex:dg2gimplicit}, this means that all symbols declared in the theory $\cn{DivisionGroup}$ (see \autoref{ex:thgroup}) are now visible in the theory $\cn{Group}$ with the definitions provided by $\cn{DG2G}$.
 \end{example}
 
-\subsection{Commutativity}\label{sec:commute}
 
-To prove commutativity, we have to find all paths in the implicit-diagram and check $M\equiv M'$ for all pairs of morphisms between the same nodes.
+It is plausible to say that there are implicit morphisms $S_i\harr S_1\cup S_2$ for $i=1,2$ that map all constants to themselves.
+However, union expressions do not interact very well with implicit morphisms.
+First of all, we have to be careful to maintain the uniqueness condition.
+For example, assume there is a implicit morphism $M:S\to T$ that is not simply an inclusion.
+Then the union $S\cup T$ cannot be well-formed.
+If it were, we would have two different implicit morphisms $S\to S\cup T$, namely $M$ and the inclusion into the union.
 
-\mmt reduces $M\equiv M'$ for $M,M'\in\Mo{S}{T}$ to a first-order problem in the theory of categories, which uses the following axioms:
+Secondly, it becomes difficult to lookup whether an implicit morphism exists between union theories.
+We need to consider the equational theory of union (including commutativity, idempotence, and associativity), which is doable for unions but may become undecidable if more module expression formation operators are added.
+Already the interaction between union and composition morphisms can be tricky.
+
+Therefore, we use the following definition in our system:
+
+\begin{example}[Union (continued from Ex.~\ref{sem:union})]\label{impl:union}
+We assume the definitions from Ex.~\ref{impl:cat} and~\ref{impl:incl} are in place.
+We want to add union theories.
+First of all, we note that every theory can be normalized into a union of named theories.
+
+Now we make the following restriction on implicit morphisms: we maintain a diagram of implicit morphisms in which all nodes are \emph{named} theories, i.e., we do not allow implicit morphisms between union theories.
+Because there are only finitely many named theories, this is a finite data structure.
+
+Consequently, we have to forbid morphism declarations $\keyword{implicit}\,m:S\to T_1\cup T_2$ is a union --- there would be no way to record them in our diagram.
+We can allow declarations declarations $\keyword{implicit}\,m:s_1\cup\ldots\cup s_n\to t$ where the domain is a union of named theories --- in that case we simply record $m$ as an implicit morphism from $s_i$ to $t$ for all $i$.
+Similarly, any declaration $\icl{s_1\cup\ldots\cup s_n}$ in the body of theory $t$ poses no problems --- we record inclusion morphism $s_1\harr t$.
+
+Now to look up the implicit morphism (if any) from $s_1\cup\ldots\cup s_k\to t_1\cup\ldots\cup t_l$, we look up for every $i$ an implicit morphism $m_i:s_i\to t_j$ for some $j$.
+If all these $m_i$ exist and $m=m_1\cup \ldots\cup m_k$ is well-formed, then $m$ is the needed implicit morphism.
+\end{example}
+
+\paragraph{Using Implicit Morphisms}
+The intuition behind implicit morphisms is that all $S$-constants $c:E$ that can be mapped into the current theory via an implicit morphism $M:S\to T$ are directly available in $T$.
+We can practically realize this by adding new defined constants $c:M(E)=M(c)$ to $T$.
+However, physically adding definitions can be inefficient.
+It is more elegant to modify the typing rules such that $\vdash_T c:M(c)=M(E)$.
+
+To do that, we only have to make a small modification to the original rules of \mmt as presented in Sect.~\ref{sec:mmt}.
+To illustrate how simple the modification is, we repeat the original rule first for comparison:
+\[\rul{c:E[=e] \minn \flt{T}}{\vdash_T c[=e]:E}\]
+Now our modified rule is
+\[\rul{c:E[=e] \minn \flt{S}\tb \ipc{M}{S}{T}}{\vdash_T c=M(c):M(E)}\]
+
+Note that the modified rule gives every constant a definiens.
+This is a technical trick to subsume the original rule: if $c$ is already declared in $T$, we use $M=\id{T}$ and obtain $\vdash_T c=c:E$.
+We write $\ov{E}$ for the expression that arises from $E$ by recursively replacing every $c$ with its definiens.
+
+The following theorem is our central theoretical result.
+It shows that the above modification has the intended properties:
+\begin{theorem}[Conservativity of Implicit Morphisms]
+Consider any combination of modular features from the examples above that includes at least implicit identity morphisms.
+
+Then for well-formed diagrams and $S,T\in\Thy$ and $M\in\Mo{S}{T}$
+\begin{compactenum}
+ \item Whenever the original system proves $\vdash_T e=e':E$, so does the modified one.
+ \item Whenever the modified system proves $\vdash_T e=e':E$, then the original inference system proves $\vdash_T \ov{e}=\ov{e'}:\ov{E}$.
+\end{compactenum}
+\end{theorem}
+
+\begin{proof}
+For the first claim, we proceed by induction on derivations.
+We only need to consider case where the original rule was applied.
+So assume it yields $\vdash_T c[=e]:E$, i.e., $(c:E[=e]) \minn \flt{T}$.
+We apply the modified rule for the special case $\ipc{\id{T}}{T}{T}$.
+The conclusion reduces to
 \begin{compactitem}
-\item associativity of composition,
-\item neutrality of identity,
-\item $M;M'\equiv \id{S}$ as well as $M';M\equiv\id{T}$ if $M\in\Mo{S}{T}$ and $M'$ is the known *inverse of $M$,
-\item if an atomic morphism $m$ includes $M\in\Mo{R}{T}$, then $M|_R\equiv M$.
+ \item if $e$ is absent: $\vdash_T c=c:E$, which is equivalent to $\vdash_T c:E$,
+ \item if $e$ is present: $\vdash_T c=e:E$ because $M(c)=M(e)$ according to the definition of $M(-)$.
 \end{compactitem}
 
-This is a sound but not complete axiomatization of $M\equiv M'$.
-We can obtain a complete axiomatization in a totally different way: Check $\der_T M(c)\equiv M'(c)$ for all $c\in\dom{S}$.
-However, this can be extremely expensive: It requires computing $\dom{S}$ and proving an object level equality for each identifier.
-Even if the equality of objects is decidable, this is often too expensive.
-
-In fact, because implicit morphisms are meant to be used in very particular cases, we expect the above incomplete calculus to perform reasonably well in practice.
-If showing the equality of certain morphisms is hard, one should probably not make them implicit in the first place.
-
-
-\subsection{Inverse Morphisms}\label{sec:inverse}
-
-We only two use sufficient criteria to determine an *inverse of a morphism $M$.
-
-\paragraph{Conservative Extensions}
-Intuitively, $t$ extends $S$ definitionally, if it only adds defined symbols, e.g., abbreviations or theorems.
-That is the most important case of conservative extensions.
-
-\begin{definition}[Definitional Extension]
-An include declaration \[t=\{\keyword{invertible}\;\icl{S},\Sigma\}\] is \textbf{definitional} if
+For the second claim, we proceed by induction on derivations.
+We only need to consider the cases where the modified rule was applied.
+So assume it yields $\vdash_T c=M(c):M(E)$ for $(c:E[=e]) \minn \flt{S}$ and $\ipc{M}{S}{T}$.
+We distinguish two cases:
 \begin{compactitem}
- \item all symbol declarations in $\Sigma$ have a definiens,
- \item all include declarations $\icl{R}$ in $\Sigma$ are such that $R$ also definitionally includes $S$.
+ \item $M(c)=c$, i.e., $c$ does not have a definiens:
+   According to the definition of $M(-)$ this is only possible if $e$ is absent.
+   According to the definition of $\flt{T}$, this is only possible if $c=S?n$ for $S\harr T$ (including the special case $S=T$).
+   In that case, $\flt{S}\sq\flt{T}$ and $M$ is the include/identity morphism that maps all $S$-constants to themselves.
+   Now applying the induction hypothesis to the well-formedness derivation of $E$ yields $\vdash_T c:\ov{E}$ as needed.
+ \item $M(c)\neq c$, i.e., $c$ has a non-trivial definiens:
+  Definition expansion eliminates $c$ in favor of $e$.
+  Clearly $\ov{c}=\ov{M(c)}$, and we only have to show that $\vdash_T \ov{M(c)}:\ov{M(E)}$ That follows from the judgment preservation of morphisms.
 \end{compactitem}
-\end{definition}
+\end{proof}
 
-There are multiple, subtly different definitions of conservative extension.
-However, definitional extensions as defined above are always conservative (i.e., for any reasonable definition of conservativity and in any reasonable formal language).
-In fact, they are always invertible: The inverse morphism $i:t\to S$ maps
-\begin{compactitem}
- \item an identifier $c\in\dom{S}$ to $c$ and everythemselves and the others to their definiens,
- \item any other identifier, which must have a definiens $d$, to $i(d)$.
-\end{compactitem}
+\section{Identifying Theories via Implicit Isomorphisms}\label{sec:inverse}
 
-%We use two auxiliary definitions.
-%Given $u:T\to U$, we write $u|_S$ for the restriction of $u$ to $S$, i.e., the composition of the inclusion $S\harr T$ and $u$.
-%An extension $S\to T$ is retractable if there is a morphism $r:T\to S$ such that $r|_S=\id{S}$.
-%
-%Whether a given extension $S\harr T$ is conservative depends on the specific definition of conservativity and the used logic.
-%However, the most important kind of conservative extension is very easy to handle: the extension of a theory with a defined constant (e.g., an abbreviation or a theorem).
-%These extensions are always conservative (i.e., for any reasonable definition of conservativity and in any reasonable logic).
-%In fact, they are always isomorphic to the original theory.
-%
-%Extensions with definition are almost exclusively used to add something to $S$.
-%Therefore, it is reasonable to automatically designate the retraction as implicit.
-%In particular, this provides an elegant way to add theorems to $S$ in such a way that they are available to any theory importing $S$, but without actually changing $S$.
-%
-%More generally, any retractable extension $S\harr T$ is always conservative.
-%But if the retraction usually does not exist uniquely (Often an arbitrary non-canonical choice is needed, e.g., any type.), this is not enough to make the retraction implicit.
+In this section, we introduce several language extensions that introduce implicit isomorphisms.
+
+Note that because identity morphisms are implicit, our uniqueness requirement for implicit morphisms implies that two theories $S$ and $T$ must be isomorphic if there are implicit morphisms in both directions.
+Moreover, making a pair of isomorphisms implicit is well-formed if there are no other implicit morphisms between $S$ and $T$ yet.
 
 \paragraph{Renamings}
-Intuitively, an atomic morphism $m:S\to T$ is a renaming if it maps all $S$-identifiers to $T$-identifiers (rather than $T$-objects).
+We say that a named morphism $r:S\to T=\{\ldots\}$ is a \textbf{renaming} if
+\begin{compactitem}
+ \item all assignments in its body are of the form $c:=c'$ for $T$-constants $c'$ without definiens
+ \item every such $T$-constants $c'$ occurs in exactly one assignment.
+\end{compactitem}
+Clearly, every renaming is an isomorphism.
+The inverse morphisms contains the flipped assignments $c':=c$.
 
-\begin{definition}[Renaming]
-Consider a morphism $M\in\Mo{S}{T}$.
-Let $A\sq\dom{S}$ and $B\sq\dom{T}$ contain those identifiers without definiens.
-$M$ is an (injective, surjective) \textbf{renaming} if the restriction of $M(-)$ is an (injective, surjective) mapping $A\to B$.
-\end{definition}
+We make the following extension to syntax and semantics:
+\begin{compactitem}
+  \item A morphism declaration $r:s\to t=\{\ldots\}$ may carry the attribute \keyword{renaming}.
+  \item This is well-formed if there are no implicit morphism between $s$ and $t$ yet.
+  \item In that case, we define $r\in\IMo{s}{t}$ and $r^{-1}\in\Mo{t}{s}$.
+\end{compactitem}
 
-Clearly, if $m$ is an injective and surjective renaming, it is straightforward to obtain its inverse by inverting $M(-)$.
+\ednote{@DM: add example, e.g., a definition of Monoid that uses different names}
+
+\paragraph{Definitional Extensions}
+We say that the named theory $t$ is a \textbf{definitional extension} of $S$ if $t=S$ or the body of $t$ contains
+\begin{compactitem}
+ \item only constant declarations with definiens,
+ \item only include declarations of theories that are definitional extensions of $S$.
+\end{compactitem}
+\ednote{@DM: give example that extends Group with the theorem $(x^{-1})^{-1}\doteq x$ (with omitted proof)}
+
+If $t$ is a definitional extension of $S$, it is easy to prove that $t$ and $S$ are isomorphic: both isomorphisms map all constants without definiens to themselves. In particular, the isomorphism $S\to t$ maps $S$-constants to themselves and expands the definiens of all other constants.
+
+We make the following extension to syntax and semantics:
+\begin{compactitem}
+  \item An include declaration $\icl{s}$ of a named theory $s$ inside theory $t$ may carry the attribute \keyword{definitional}.
+  \item In that case, we define $\id{s}\in\IMo{t}{s}$ (in addition to the implicit morphism $\id{t}\in\IMo{s}{t}$ which is induced by the inclusion).
+\end{compactitem}
+
+\ednote{@DM: repeat previous example now with \keyword{definitional} and give another definitional extensions of Group; this new extension may already use the implicitly available definition of the first extension}
+
+\begin{remark}[Conservative Extensions]
+A definitional extension is a special case of a conservative extension.
+More generally, all retractable extensions are conservative, i.e., all extensions $S\harr T$ such that there is a morphism $r:T\to S$ such that $r$ is the identity on $S$.
+
+But we cannot make the retractions implicit morphisms in general because they are not necessarily isomorphisms.
+\end{remark}
+
+\paragraph{Canonical Isomorphisms}
+If we have isomorphisms $m:s\to t$ and $n:t\to s$, we simply spell them out in morphism declarations and add the keyword \keyword{implicit} to both.
+This requires no language extensions.
+
+\ednote{@DM: add the isomorphism of DG2G}
+\begin{example}\label{group:iso}
+We give the morphism $\cn{G2DG}$.
+\end{example}
+
+While the first one of these declarations is straightforward, the second one requires checking that $m$ and $n$ are actually isomorphism.
+Otherwise, the uniqueness condition would be violated.
+Thus, we have to check $m;n=\id{s}$ and $n;m=\id{t}$.
+In general, the equality of two morphisms $f,g:A\to B$ is equivalent to $\vdash_B f(c)=g(c)$ for all $c:E\in\flt{A}$.
+Thus, if equality of expressions is decidable in the logic that \mmt is instantiated with, then \mmt can check this directly.
+
+However, this does not work in practice.
+Already elementary examples require stronger, undecidable equality relations are used:
+
+\begin{example}
+Consider the isomorphism from Ex.~\ref{group:iso}.
+The result of mapping $x\circ y$ from $\cn{Group}$ to $\cn{DivGroup}$ and back is $x\circ(unit\circ y^{-1})^{-1}$.
+Clearly, the group axioms imply that this is equal to $x\circ y$.
+But formally that requires working with the undecidable equality of first-order logic.
+\end{example}
+
+Therefore, in our running example, we only make one of the two isomorphisms implicit.
+
+In the sequel, we design a general solution to this problem.
+It allows systematically proving the equality of two morphisms and using that to make both isomorphisms implicit.
+This is novel work, but it requires significant prerequisites and is only peripherally related to implicit morphisms.
+Therefore, we only sketch the idea and leave the details to future work.
+
+We add a language feature to \mmt to prove equalities between morphisms:
+We add the productions
+\begin{grammar}
+Dia   & \rep{(TDec \alt MDec\alt MEq)}  &\\
+MEq   & \keyword{equal} M=M:T\to T by \{\rep{Ass}\} &\\
+\end{grammar}
+
+%Firstly, the intuition of $\keyword{equality} T = \{c:=E,\ldots\}$ is that it provides to every base type $c:\type$ of $T$ a judgment $E:c\to c\to \type$ that defines the $T$-specific equality relation for objects of type $c$.
+%Technically, this must be a binary logical relation in the sense of \cite{RS:logrels:12} on $\id{T}$.
+%As described in \cite{RS:logrels:12}, this induces an equality predicate $\cn{Equal}_E:E\to E\to \type$ on every type $E$.
+
+We define the declaration $M=N:S\to T by \{\sigma\}$ to be well-formed iff
+\begin{compactitem} 
+  \item $M:S\to T$ and $N:S\to T$ are well-formed morphisms
+  \item $\sigma$ contains exactly one assignment $c:=p$ for every $(c:E)\in\flt{S}$
+  \item for each of these assignments $c:=p$, the term $p$ is a proof of $\vdash_T M(c)=N(c)$.
+\end{compactitem}
+
+To make $m$ and $n$ from above implicit isomorphisms, we have to do three things: define $m$ and $n$, prove the equalities of $m;n=\id{s}$ and $n;m=\id{t}$, and make $m$ and $n$ implicit.
+Note that we cannot make both $m$ and $n$ implicit right away because that is only well-formed after proving the equalities.)
+Thus, we define a new attribute \keyword{implicit-later}, which states that a morphism should be considered implicit as soon as subsequent equality proves make it well-formed to do so.
+
+\begin{example}[Isomorphisms]
+We can now add declarations
+ \[\keyword{implicit}:\cn{DG2G}:\cn{DivGroup}\to\cn{Group}=\text{(as above)}\]
+ \[\keyword{implicit-later}:\cn{G2DG}:\cn{Group}\to\cn{DivGroup}=\text{(as above)}\]
+ \[\keyword{equal}\cn{G2DG};\cn{DG2G}=\id{\cn{Group}}:\cn{Group}\to\cn{Group}=\text{(omitted)}\]
+ \[\keyword{equal}\cn{DG2D};\cn{G2DG}=\id{\cn{DivGroup}}:\cn{DivGroup}\to\cn{DivGroup}=\text{(omitted)}\]
+where the isomorphisms are as above and we omit all the equality proofs.
+\end{example}
+
+
+%\subsection{Commutativity}\label{sec:commute}
+%
+%To prove commutativity, we have to find all paths in the implicit-diagram and check $M\equiv M'$ for all pairs of morphisms between the same nodes.
+%
+%\mmt reduces $M\equiv M'$ for $M,M'\in\Mo{S}{T}$ to a first-order problem in the theory of categories, which uses the following axioms:
+%\begin{compactitem}
+%\item associativity of composition,
+%\item neutrality of identity,
+%\item $M;M'\equiv \id{S}$ as well as $M';M\equiv\id{T}$ if $M\in\Mo{S}{T}$ and $M'$ is the known *inverse of $M$,
+%\item if an atomic morphism $m$ includes $M\in\Mo{R}{T}$, then $M|_R\equiv M$.
+%\end{compactitem}
+%
+%This is a sound but not complete axiomatization of $M\equiv M'$.
+%We can obtain a complete axiomatization in a totally different way: Check $\der_T M(c)\equiv M'(c)$ for all $c\in\dom{S}$.
+%However, this can be extremely expensive: It requires computing $\dom{S}$ and proving an object level equality for each identifier.
+%Even if the equality of objects is decidable, this is often too expensive.
+%
+%In fact, because implicit morphisms are meant to be used in very particular cases, we expect the above incomplete calculus to perform reasonably well in practice.
+%If showing the equality of certain morphisms is hard, one should probably not make them implicit in the first place.
 

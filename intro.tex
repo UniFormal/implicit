@@ -46,6 +46,7 @@ Our starting point is the \mmt language \cite{RK:mmt:10}, which already provides
 Therefore, all our results are foundation-independent --- users of a particular language $L$ can use \mmt directly as a structuring formalism for $L$ or can easily transfer our results to a dedicated implementation of $L$.
 
 More precisely, out contribution is twofold.
+\medskip
 
 Firstly, we give a novel presentation of the syntax and semantics \mmt.
 Contrary to the original presentation in \cite{RK:mmt:10}, which hard-coded a single structuring mechanism --- there called \textit{structures} --- our definitions allows for adding arbitrary independent structuring mechanisms.
@@ -55,8 +56,16 @@ Based on this extensible definition, we can introduce several additional structu
 Many of these have already been implemented in the \mmt tool but were not formally defined  a formal definition of their semantics as a part of the \mmt language had previously proved too complicated to spell out elegantly.
 With our reformulation, this is now not only possible but very easy and elegant.
 As an example, we give includes and unions of theories, which induce the most important special cases of implicit morphisms.
+\medskip
 
-Secondly, we describe implicit morphisms as a novel feature of \mmt and give a number of examples for obtaining and using implicit morphisms.
+Secondly, we describe implicit morphisms as a novel feature of \mmt.
+Due to our novel presentation of the syntax and semantics, only minor modifications are needed to define the syntax and semantics of implicit morphisms.
+
+A very common situation in developing large libraries (both in formal and informal developments) is to identity two theories $S$ and $T$ via a canonical choice of isomorphisms.
+In these cases, it is often desirable to identify $S$ and $T$, e.g., when working with $S$, we want to be able to use $T$-syntax directly without having to apply an isomorphism.
+One of the major short-comings of formal theories over traditional informal developments is that formal systems usually need to spell out these isomorphisms everywhere.
+We show that implicit morphisms elegantly allow exactly that kind of intuitive identification.
+As concrete examples, we consider manual isomorphisms, definitional extensions, and renamings.
 In particular, we recover the concept of realms \cite{realms} as a special case of implicit morphisms.
 
 In fact, implicit morphisms work so well that we have refactored the \mmt tool in such a way that implicit morphisms are now more primitive than inclusion morphisms.
