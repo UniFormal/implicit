@@ -49,15 +49,7 @@ The set of attributes is itself extensible, and the above grammar only list the 
 Additional attributes can be added when adding modularity principles.
 
 \begin{example}\label{ex:dg2gimplicit}
-Going back to the morphism presented in \autoref{ex:dg2g}, we simply add the keyword \lstinline|implicit| in front, to declare it to be implicit:
-\begin{mmtcode}
-implicit view DG2G : ?DivisionGroup -> ?Group =
-  universe = universe ❙
-  div = [a,b] a ∘ (b⁻¹) ❙
-  nonEmpty = e ❙
-  // axioms ...❙
-❚
-\end{mmtcode}
+We can now change the declaration of the morphism $\cn{DG2G}$ from Ex.~\ref{ex:dg2g} by adding the attribute \keyword{implicit}.
 \end{example}
 
 \subsection{Semantics}
@@ -69,25 +61,34 @@ The first change govern how we obtain implicit morphisms, the second one how we 
 Based on the above attributes, we define the set $\IMo{S}{T}\sq\Mo{S}{T}$ of \textbf{implicit} morphisms to contain the following elements:
 \begin{itemize}
  \item all declared morphisms $m:S\to T=\{\sigma\}$ whose declaration carries the attribute $\keyword{implicit}$,
- \item all morphisms that additional modularity principles designate as implicit based on the use of additional attributes.
+\begin{nomodexp}
+ \item all identity morphisms $\id{T}$,
+ \item all compositions $M;N$ of implicit morphisms $M$ and $N$,
+\end{nomodexp}
+ \item all morphisms that additional language features designate as implicit based on the use of additional attributes.
 \end{itemize}
 
 To define well-formedness for our extended syntax, we say that adding an attribute to a declaration is only well-formed if there is (up to equality of morphisms) at most one implicit morphism for any pair of theories, i.e., $\IMo{S}{T}$ has cardinality $0$ or $1$.
+Thus, the implicit morphisms form a thin broad subcategory of theories and morphisms.
+In other words, the implicit morphisms form commutative diagram.
+
+\begin{modexp}
 Depending on what modularity principles we add, equality of morphisms may or may not be decidable.
 Therefore, in the general case, implementations may have to employ sound but incomplete criteria for equality (see Sect.~\ref{sec:commute}).
+\end{modexp}
 
+\begin{modexp}
 The following example phrases the restriction on implicit morphisms in categorical terms:
-
 \begin{example}[Category of Theories and Implicit Morphisms (continued from Ex.~\ref{sem:cat})]\label{impl:cat}
 We define the following morphisms are implicit:
 \begin{compactitem}
  \item all identity morphisms $\id{T}$,
  \item all compositions $M;N$ of implicit morphisms $M$ and $N$.
 \end{compactitem}
-
 Thus, the implicit morphisms form a thin broad subcategory of theories and morphisms.
 In other words, the implicit morphisms form commutative diagram.
 \end{example}
+\end{modexp}
 
 \begin{example}[Includes (continued from Ex.~\ref{sem:incl})]\label{impl:incl}
 For include morphism, we add the following definition: if theory $t$ contains the declaration $\icl{S}$, then the induced morphism from $S$ to $t$ is implicit.
@@ -97,10 +98,10 @@ That corresponds to the intuition that anything that is include should be availa
 \end{example}
 
 \begin{example}
-	For our morphism $\cn{DG2G}$ from \autoref{ex:dg2gimplicit}, this means that all symbols declared in the theory $\cn{DivisionGroup}$ (see \autoref{ex:thgroup}) are now visible in the theory $\cn{Group}$ with the definitions provided by $\cn{DG2G}$.
+	For our morphism $\cn{DG2G}$ from Ex.~\ref{ex:dg2gimplicit}, this means that all symbols declared in the theory $\cn{DivisionGroup}$ (see Ex.~\ref{ex:thgroup}) are now visible in the theory $\cn{Group}$ with the definitions provided by $\cn{DG2G}$.
 \end{example}
 
-
+\begin{union}
 It is plausible to say that there are implicit morphisms $S_i\harr S_1\cup S_2$ for $i=1,2$ that map all constants to themselves.
 However, union expressions do not interact very well with implicit morphisms.
 First of all, we have to be careful to maintain the uniqueness condition.
@@ -129,6 +130,7 @@ Similarly, any declaration $\icl{s_1\cup\ldots\cup s_n}$ in the body of theory $
 Now to look up the implicit morphism (if any) from $s_1\cup\ldots\cup s_k\to t_1\cup\ldots\cup t_l$, we look up for every $i$ an implicit morphism $m_i:s_i\to t_j$ for some $j$.
 If all these $m_i$ exist and $m=m_1\cup \ldots\cup m_k$ is well-formed, then $m$ is the needed implicit morphism.
 \end{example}
+\end{union}
 
 \paragraph{Using Implicit Morphisms}
 The intuition behind implicit morphisms is that all $S$-constants $c:E$ that can be mapped into the current theory via an implicit morphism $M:S\to T$ are directly available in $T$.
@@ -242,6 +244,7 @@ This requires no language extensions.
 \ednote{@DM: add the isomorphism of DG2G}
 \begin{example}\label{group:iso}
 We give the morphism $\cn{G2DG}$.
+
 \end{example}
 
 While the first one of these declarations is straightforward, the second one requires checking that $m$ and $n$ are actually isomorphism.
