@@ -45,23 +45,23 @@ Our starting point is the \mmt language \cite{RK:mmt:10}, which already provides
 \mmt is foundation-independent in the sense that it allows embedding a large variety of declarative languages (logics, type-theories, etc.).
 Therefore, all our results are foundation-independent --- users of a particular language $L$ can use \mmt directly as a structuring formalism for $L$ or can easily transfer our results to a dedicated implementation of $L$.
 
-More precisely, out contribution is twofold.
+More precisely, our contribution is twofold.
 \medskip
 
-Firstly, we give a novel presentation of the syntax and semantics \mmt.
+Firstly, we give a novel presentation of the syntax and semantics of \mmt.
 Contrary to the original presentation in \cite{RK:mmt:10}, which hard-coded a single structuring mechanism --- there called \textit{structures} --- our definitions allows for adding arbitrary independent structuring mechanisms.
 This required a from-scratch redesign of the original presentation in \cite{RK:mmt:10} (which is why this paper has no preliminaries section).
 
 Based on this extensible definition, we can introduce several additional structuring mechanisms.
-Many of these have already been implemented in the \mmt tool but were not formally defined  a formal definition of their semantics as a part of the \mmt language had previously proved too complicated to spell out elegantly.
-With our reformulation, this is now not only possible but very easy and elegant.
+Many of these have already been implemented in the \mmt tool but were not formally defined  -- a formal definition of their semantics as a part of the \mmt language had previously proved too complicated to spell out elegantly.
+With our reformulation, this is now not only possible but very easy.
 As an example, we give includes and unions of theories, which induce the most important special cases of implicit morphisms.
 \medskip
 
 Secondly, we describe implicit morphisms as a novel feature of \mmt.
 Due to our novel presentation of the syntax and semantics, only minor modifications are needed to define the syntax and semantics of implicit morphisms.
 
-A very common situation in developing large libraries (both in formal and informal developments) is to identity two theories $S$ and $T$ via a canonical choice of isomorphisms.
+A very common situation in developing large libraries (both in formal and informal developments) is to identify two theories $S$ and $T$ via a canonical choice of isomorphisms.
 In these cases, it is often desirable to identify $S$ and $T$, e.g., when working with $S$, we want to be able to use $T$-syntax directly without having to apply an isomorphism.
 One of the major short-comings of formal theories over traditional informal developments is that formal systems usually need to spell out these isomorphisms everywhere.
 We show that implicit morphisms elegantly allow exactly that kind of intuitive identification.
