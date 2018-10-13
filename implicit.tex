@@ -52,11 +52,10 @@ Additional attributes can be added when adding modularity principles.
 Going back to the morphism presented in \autoref{ex:dg2g}, we simply add the keyword \lstinline|implicit| in front, to declare it to be implicit:
 \begin{mmtcode}
 implicit view DG2G : ?DivisionGroup -> ?Group =
-  universe = universe ❙
-  div = [a,b] a ∘ (b⁻¹) ❙
-  nonEmpty = e ❙
-  // axioms ...❙
-❚
+  universe = universe
+  div = [a,b] a ∘ (b⁻¹) 
+  nonEmpty = e 
+  // axioms ...
 \end{mmtcode}
 \end{example}
 

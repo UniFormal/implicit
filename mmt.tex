@@ -65,7 +65,7 @@ Here, in order to avoid case distinctions for the case where a definition is pre
 Correspondingly, the definition of the homomorphic extension of a morphism with domain $S$ includes the following case for constants:
 \[M(c) = \cas{e\mifc (c:E) \in \flt{S}, (c:=e)\in\flt{M} \\ M(e) \mifc (c:E=e)\in \flt{S}}\]
 Here if $c$ has a definiens in $S$, we expand it before applying $M$.%
-\footnote{The \mmt tool also $c:e\in \flt{M}$ even if $(c:E=e')\in\flt{S}$ has a definition. In that case, \mmt checks $\vdash_T M(e')=e$ and puts $M(c)=e$. This is important for efficiency but not essential for our purposes here.}
+\footnote{The \mmt tool accepts $c:e\in \flt{M}$ even if $(c:E=e')\in\flt{S}$ has a definition. In that case, \mmt checks $\vdash_T M(e')=e$ and puts $M(c)=e$. This is important for efficiency but not essential for our purposes here.}
 
 Note that these base cases introduce a mutual recursion between well-formedness and flattening:
 the well-formedness of a declaration in a theory depends on the flattening of all preceding declarations;
@@ -104,7 +104,7 @@ o        & c \alt \ldots         & \text{expressions built from constants} \\
 T        & t                     & \text{theory expressions}
 \end{grammar}
 
-In a theory declaration, each symbol \textbf{name} $n$ may be declared only once, and its \textbf{type} and \textbf{definiens} (if present) must be closed expressions only previously introduced constants.
+In a theory declaration, each symbol \textbf{name} $n$ may be declared only once, and its \textbf{type} and \textbf{definiens} (if present) must be closed expressions over the previously introduced constants only.
 We omit the remaining productions for expressions here, which allow forming complex expressions using application, binding, variables, literals, etc.
 \end{definition}
 
@@ -136,7 +136,7 @@ Moreover, we use a few constants from a type systems\ednote{finish}$\forall,\dot
 
 At this point, this grammar only allows forming flat theories, i.e., $\Thy=\thy$.
 It is intentionally independent of the concrete choice of modularity principles, i.e., the kinds of module-structuring declarations (e.g., includes) and the module-expression-forming operators (e.g., union).
-But it already introduces all non-terminals for modularity: new declaration kinds for structured theories arise by adding production for the non-terminal $Dec$ and new theory expressions are formed by adding productions for the non-terminal $T$.
+But it already introduces all non-terminals for modularity: new declaration kinds for structured theories arise by adding productions for the non-terminal $Dec$ and new theory expressions are formed by adding productions for the non-terminal $T$.
 This makes it easy to incrementally add new declaration kinds and operators to the language.
 
 %These theories are similar to OpenMath content dictionaries \cite{openmath}.
@@ -188,7 +188,7 @@ A \textbf{diagram} is a list of theory and morphism declarations:
 \begin{grammar}
 Dia    & \rep{(TDec \alt MDec)}          & \text{diagrams}\\
 \end{grammar}
-A diagram is well-formed if each atomic theory/morphism declaration has a unique name is well-formed relative to the diagram preceding it.
+A diagram is well-formed if each atomic theory/morphism declaration has a unique name and is well-formed relative to the diagram preceding it.
 \end{definition}
 
 We give some examples how to add modularity principles to the grammar:
@@ -240,7 +240,7 @@ For each example, we will define the semantics in the next section.
 \paragraph{Flattening}
 Just like the syntax, the definition of flattening is \textbf{compositional} in the sense that new modularity principles can be added later independently of each other.
 In particular, for every module expression $X$, we define its flattening $\flt{X}$ by induction on the syntax.
-This follows the principle of compositional semantics, e.g., $\flt{(f(X,Y))}$ depends only on $\flt{X}$ and $flt{Y}$. 
+This follows the principle of compositional semantics, e.g., $\flt{(f(X,Y))}$ depends only on $\flt{X}$ and $\flt{Y}$. 
 
 For theories $T$, at this point, this induction only has the base case of a reference to a declared theory $t$.
 Further cases arise when we add structuring declarations.
@@ -278,7 +278,7 @@ Therefore, flattening and well-formedness must be distinguished:
   \[\fltd{\sigma}{\icl{M}} = \flt{M}\]
 under the condition $\flt{M}$ agrees with $\flt{\sigma}$ on any constant that is in the domain of both.
 
-The flat variant $\cn{Group}^\flat$ of our refactored theory $\cn{Group}$ from \autoref{syn:incl} is hence given by copying all included symbols (from $\cn{Monoid}$) over to $\cn{Group}$, resulting in exactly the theory as presented earlier in \autoref{ex:thgroup} except for global identifiers.
+The flat variant $\cn{Group}^\flat$ of our refactored theory $\cn{Group}$ from \autoref{syn:incl} is hence given by copying all included symbols (from $\cn{Monoid}$) over to $\cn{Group}$, resulting in exactly the theory as presented earlier in \autoref{ex:thgroup} except for global identifiers from $\cn{Monoid}$ -- i.e. the prefixes $t$ in $t?n$.
 \end{example}
 
 \begin{example}[Union (continued from Ex.~\ref{syn:union})]\label{sem:union}
@@ -336,7 +336,7 @@ In fact, $\flt{s}$ and $\flt{t}$ unless $s=t$.
 
 \begin{example}[Union (continued from Ex.~\ref{sem:union})]\label{rel:union}
 We have the following soundness theorem for unions: $S_i\harr S_1\cup S_2$.
-Moreover, $S_1\cup S_2$ is a colimit in the category of theories and morphism, and $M_1\cup M_2\in\Mo{S_1\cup S_2}{T}$ is the universal morphism out of it.
+Moreover, $S_1\cup S_2$ is a colimit in the category of theories and morphism, and given $M_1\in\Mo(S_1,T)$ and $M2\in\Mo{S_2,T}$ we have the universal morphism $M_1\cup M_2\in\Mo{S_1\cup S_2}{T}$ out of it.
 \end{example}
 
 \begin{example}[Category of Theories (continued from Ex.~\ref{sem:cat})]\label{rel:cat}
