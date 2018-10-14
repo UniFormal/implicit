@@ -13,15 +13,17 @@ In the above example, we would
  \item keep \cn{Group} as it is, i.e., also with an include \cn{Monoid},
  \item add an implicit morphism $\cn{CancellationMonoid}\to\cn{Group}$.
 \end{compactitem}
+\medskip
 
-In the sequel, we develop a similar, more complex example: we build a hierarchy of theories between \cn{Band} and \cn{Semilattice}.
+As a more complex example, we have built a hierarchy of theories between \cn{Band} and \cn{Semilattice}.
 \ednote{@DM: this is not quite the lattice from the Wikipedia page: it consists of the 3x3 square plus Bands at the top}
 All of these theories are of the form $t=\{\icl{\cn{Band}},\,a:\vdash F\}$, where $F$ is a universally quantified equational axiom.\footnote{All varieties of bands can be axiomatized in this way.}
 In particular, $\cn{SemiLattice}=\{\icl{\cn{Band}},\,a:\vdash \forall [x]\forall [y] x\circ y\doteq y\circ x\}$.
 Fig.~\ref{fig:bands} shows these theories.
 
 There are various morphisms between them that describe the lattice structure of the corresponding varieties of bands.
-All of these map the constants from \cn{Band} to themselves and the axiom $a$ to a proof.\footnote{Our formalization of the lattice of bands using implict morphisms can be found at \url{https://gl.mathhub.info/MitM/smglom/blob/devel/source/algebra/bands.mmt} and \url{https://gl.mathhub.info/MitM/smglom/blob/devel/source/algebra/lattice.mmt}}
+All of these map the constants from \cn{Band} to themselves and the axiom $a$ to a proof.%
+\footnote{Our formalization of the lattice of bands using implicit morphisms can be found at \url{https://gl.mathhub.info/MitM/smglom/blob/devel/source/algebra/bands.mmt}.}
 We make all of these morphisms implicit.
 It is straightforward to prove that the diagram commutes: any two morphisms are identical except for assignment for the axiom.
 Here, \mmt can discharge the proof obligation easily using proof irrelevance.

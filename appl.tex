@@ -21,17 +21,17 @@ We make the following extension to syntax and semantics:
   \item In that case, we define $r\in\IMo{s}{t}$ and $r^{-1}\in\Mo{t}{s}$.
 \end{compactitem}
 
-\begin{example}
-	Consider a variation of the theory $\cn{Monoid}$ from \autoref{syn:incl} in a different library:
-	\begin{mmtcode}
+\begin{example}[Renaming]
+Consider a variation of the theory $\cn{Monoid}$ from Ex.~\ref{syn:incl} in a different library:
+\begin{mmtcode}
 Monoid2 =
   M: type
   connective : M ⟶ M ⟶ M	 # 1 ∘ 2 
   neutral	: M
 \end{mmtcode}
-This theory is isomorphic to the previously introduced theory $\cn{Monoid}$ under the trivial renaming
+This theory is isomorphic to the previously introduced theory \cn{Monoid} under the trivial renaming
 	\begin{mmtcode}
-Monoids : Monoid2 -> Monoid =
+renaming MonoidRen : Monoid2 -> Monoid =
   M 		:= U
   connective 	:= op 
   neutral	:= unit
@@ -44,14 +44,6 @@ We say that the named theory $t$ is a \textbf{definitional extension} of $S$ if 
  \item only constant declarations with definiens,
  \item only include declarations of theories that are definitional extensions of $S$.
 \end{compactitem}
-\begin{example}
-	Imagine extending the theory $\cn{Group}$ from \autoref{syn:incl} by provable theorems:
-		\begin{mmtcode}
-Group_Theorems =
-  include Group
-  inverse_idem : ⊦∀[x] (x⁻¹)⁻¹≐x 	= (proof)
-\end{mmtcode}
-\end{example}
 
 If $t$ is a definitional extension of $S$, it is easy to prove that $t$ and $S$ are isomorphic: both isomorphisms map all constants without definiens to themselves. In particular, the isomorphism $S\to t$ maps $S$-constants to themselves and expands the definiens of all other constants.
 
@@ -60,16 +52,13 @@ We make the following extension to syntax and semantics:
   \item An include declaration $\icl{s}$ of a named theory $s$ inside theory $t$ may carry the attribute \keyword{definitional}.
   \item In that case, we define $\id{s}\in\IMo{t}{s}$ (in addition to the implicit morphism $\id{t}\in\IMo{s}{t}$ which is induced by the inclusion).
 \end{compactitem}
-\begin{example}
-	We adapt our theory $\cn{Group\_Theorems}$ with the newly introduced keyword, which allows us to extend $\cn{Group}$ directly while having the new theorem $\cn{inverse\_idem}$ available:
-		\begin{mmtcode}
-Group_Theorems =
-  definitional include Group
-  inverse_idem : ⊦∀[x] (x⁻¹)⁻¹≐x 	= (proof)
 
-More_Theorems =
-  include ?Group
-  some_other_theorem : ⊦ ??	= (proof using inverse_idem)
+\begin{example}[Extension with a Theorem]
+We extend the theory $\cn{Group}$ from Ex.~\ref{syn:incl} with a theorem
+\begin{mmtcode}
+definitional InverseInvolution =
+  include Group
+  inverse_invol : ∀[x] (x⁻¹)⁻¹≐x 	= (proof omitted)
 \end{mmtcode}
 \end{example}
 
@@ -85,13 +74,13 @@ If we have isomorphisms $m:s\to t$ and $n:t\to s$, we simply spell them out in m
 This requires no language extensions.
 
 \begin{example}\label{group:iso}
-Having declared the morphism $\cn{DG2G}$ (as in \autoref{ex:dg2g}) implicit, we do the same with the reverse morphism  $\cn{G2DG}$:
+Having declared the morphism $\cn{DG2G}$ (as in Ex.~\ref{ex:dg2g}) implicit, we do the same with the reverse morphism  $\cn{G2DG}$:
 \begin{mmtcode}
 implicit G2DG : Group -> DivisionGroup =
   U := U
-  op := [a,b] a / ((unit/unit) / b) 
-  unit := unit/unit
-  inverse := [a] (unit/unit) / a
+  op := [a,b] a/(unit/b) 
+  unit := unit
+  inverse := [a] unit/a
 \end{mmtcode}
 \end{example}
 
@@ -173,15 +162,11 @@ With implicit morphisms, we can solve this problem by making only the following 
   \item We add an implicit morphism $s\to t$ that maps $s?n$ to $r'?n$.
 \end{compactenum}
 Now $t$ has the desired new structure.
-But, all old references to $s?n$ stay well-formed so that no global changes are needed, as in \autoref{fig:refac}.
+But, all old references to $s?n$ stay well-formed so that no global changes are needed, as in Fig.~\ref{fig:refac}.
 
-\begin{figure}\begin{center}
-
-\begin{minipage}[t]{0.4\textwidth}
+The situation before (left) and after (right) refactoring is given below:
 \begin{center}
-Before:
-
-\begin{tikzpicture}[scale=1.5]
+\begin{tikzpicture}[scale=1]
   \node (t) at (0,0) {$t$};
   \node (r) at (-1,-2) {$r$};
   \node (s) at (1,-1) {$s$};
@@ -197,13 +182,8 @@ Before:
   %\node at (t2) {$C$};
   %\draw[view] (t1) to[out=10,in=170] node[above] {$\sigma$} (t2);
 \end{tikzpicture}
-\end{center}
-\end{minipage}
-\begin{minipage}[t]{0.4\textwidth}
-\begin{center}
-After:
-
-\begin{tikzpicture}[scale=1.5]
+\tb
+\begin{tikzpicture}[scale=1]
   \node (t) at (0,0) {$t$};
   \node (rp) at (-1,-1) {$r'$};
   \node (s) at (1,-1) {$s$};
@@ -228,8 +208,3 @@ After:
   %\draw[view] (t1) to[out=10,in=170] node[above] {$\sigma$} (t2);
 \end{tikzpicture}
 \end{center}
-\end{minipage}
-
-\end{center}
-\caption{An Example for Transparent Refactoring}\label{fig:refac}
-\end{figure}

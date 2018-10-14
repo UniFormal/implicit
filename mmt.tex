@@ -36,10 +36,6 @@ The details can be found in \cite{rabe:howto:14}.
 \textbf{Flat morphisms} from a theory $S$ to a theory $T$ are lists of assignments $c:=e$ where $c\in\dom{S}$ and $e\in\Exp{T}$.
 Every morphism $M$ induces a \textbf{homomorphic extension} $M(-):\Exp{S}\to\Exp{T}$, which replaces every $c\in\dom{S}$ in an $S$-expression with the $T$-expression $e$ such that $c:=e$ in $M$.
 
-The declarations in theories and morphisms are subject to typing conditions that are not essential for our purposes here.
-We only mention the main theorem that guarantees that well-typed morphisms preserve judgments, i.e., if $\vdash_S e:E$, then $\vdash_T M(e):M(E)$.
-This includes the preservation of truth via the propositions-as-types principle where $E$ is a proposition and $e$ its proof.
-
 An \mmt \textbf{diagram} consists of a set of named structured module declarations.
 \begin{nomodexp}
 For a given diagram, we write $\Thy$ for the set of theory names.
@@ -68,13 +64,18 @@ Then flattening assigns
  \item to each $M\in\Mo{S}{T}$ the flat morphism $\flt{M}$ from $\flt{S}$ to $\flt{T}$.
 \end{compactitem}
 
-\paragraph{Well-Formed Expressions}
-The inference system to define well-formed expressions is not a primary interest of this paper.
-Intuitively, the set $\Exp{T}$ of expressions over $T$ includes all syntax trees that can be formed using the constants from $\flt{T}$.
-Moreover, well-formed modules may only use expressions that satisfy certain typing and equality judgments.
+\paragraph{Logics and Well-Formed Expressions}
+The logic and the definition of well-formed expressions are not a primary interest of this paper, and we only recap the essential structure needed in the sequel.
 We refer to \cite{rabe:howto:14} for details.
 
-The only aspect of the inference system for these judgments that is relevant to our purposes here is the rules for constants:
+\mmt itself is independent of the base logic and provides a theory and theory morphism layer on top of an arbitrary declarative language.
+Our results in this paper are similarly logic-independent.
+The syntax and semantics of that base logic is provided by a set of rules for the judgments $\vdash_T e:E$ and $\vdash_T e=e'$ for $e,e',E\in\Exp{T}$.
+The declarations in theories and morphisms are subject to typing conditions using these judgments.
+The main theorem about \mmt is that well-typed morphisms $M:S\to T$ preserve all judgments, e.g,., if $\vdash_S e:E$, then $\vdash_T M(e):M(E)$.
+This includes the preservation of truth via the propositions-as-types principle if $E$ is a proposition and $e$ its proof.
+
+The only aspect of the inference system for these judgments that is relevant to our purposes here is the typing rule for constants:
 \[\rul{c:E[=e] \minn \flt{T}}{\vdash_T c[=e]:E}\]
 Here, in order to avoid case distinctions for the case where a definition is present or not, we use a combined typing+equality judgment: $e_1=e_2:E$ represents the conjunction of $e_1:E$, $e_2:E$, and $e_1=e_2$.
 Correspondingly, the definition of the homomorphic extension of a morphism with domain $S$ includes the following case for constants:
@@ -102,14 +103,6 @@ Therefore, we will make flattening a partial function, i.e., $\flt{X}$ is undefi
 %Similarly, consider an assignment $c:=e$ in a morphism $m$ from $S$ to $T$, where $c:E$ is a declaration is $S$.
 %It is well-formed if $\vdash_T e:\flt{m}(E)$.
 
-\paragraph{Logics in \mmt}
-\ednote{explain that we use a fixed instance of MMT which adds LF and FOL; only relevant for examples}
-\mmt itself is foundation independent and parmetric in a set of typing rules. We omit the details on implementing type systems and logical frameworks in \mmt, and will instead assume theories for the logical framework LF and an implementation of first-order logic for the examples in the remainder of this paper.
-
-Specifically, we assume a theory $\cn{LF}$ that implements the dependently-typed lambda calculus LF. This theory provides symbols for dependent function types $\prod_{c:A}B(x)$ (in surface syntax: \lstinline|{x:A}B x|), simple function types $A\to B$ (as abbreviation for $\prod_{\_:A}B$, lambda abstractions $\lambda x:A.\; t(x)$ (in surface syntax: \lstinline|[x:A] t x|) and function application $f a$.
-
-The theory \cn{LF} is used as a meta-theory for a theory \cn{FOL} implementing first-order logic with equality. This theory provides symbols for the quantifiers $\forall$ and $\exists$ (implemented via higher-order abstract syntax, i.e. the proposition $\forall x.\; P(x)$ is written as $\forall$\lstinline|[x:U]P x| for a fixed type $U$), equality $\doteq$ and the usual logical connectives $\neg,\wedge,\vee$, etc.
-
 \subsection{Syntax}
 
 We start with the syntax for theories (which arises as a special case of the one given in \cite{RK:mmt:10}):
@@ -128,7 +121,11 @@ We omit the remaining productions for expressions here, which allow forming comp
 \end{definition}
 
 \begin{example}\label{ex:thgroup}
-The (flat) theories $\cn{Group}$ and $\cn{DivGroup}$ from the introduction are:
+For the purposes of our running examples, we assume a fixed base logic that provides a first-order logic a simple type system.
+\lstinline|type| is the universe of types, \lstinline|A ⟶ B| is the type of functions, and lambda abstraction is written \lstinline|[x:A] t x|.
+We also use \mmt notations, which are attached to constant declarations as \lstinline|# <not>|; these are omitted from the formal grammar above because we only use them in the examples.
+
+Then the (flat) theories $\cn{Group}$ and $\cn{DivGroup}$ from the introduction are:
 \begin{mmtcode}
 Group =
   U		: type
@@ -144,9 +141,6 @@ DivisionGroup =
   unit 	: U
   // axioms omitted
 \end{mmtcode}
-Here we use \lstinline|# <not>| to indicate notations; these are part of the language supported by \mmt but omitted from the formal grammar above because we only need them here to present legible examples.
-
-Moreover, we use the constants from the theories $\cn{LF}$ and $\cn{FOL}$ described above.
 \end{example}
 
 At this point, this grammar only allows forming flat theories, i.e., $\Thy=\thy$.
