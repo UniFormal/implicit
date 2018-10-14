@@ -164,9 +164,6 @@ With implicit morphisms, we can solve this problem by making only the following 
   \item We change $t$ to $t=\{\icl{r'},\icl{s'}\}$.
   \item We add an implicit morphism $s\to t$ that maps $s?n$ to $r'?n$.
 \end{compactenum}
-Now $t$ has the desired new structure.
-But, all old references to $s?n$ stay well-formed so that no global changes are needed, as in Fig.~\ref{fig:refac}.
-
 The situation before (left) and after (right) refactoring is given below:
 \begin{center}
 \begin{tikzpicture}[scale=1]
@@ -211,3 +208,5 @@ The situation before (left) and after (right) refactoring is given below:
   %\draw[view] (t1) to[out=10,in=170] node[above] {$\sigma$} (t2);
 \end{tikzpicture}
 \end{center}
+Afterwards, $t$ has the desired new structure.
+But all old references to $s?n$ stay well-formed so that no global changes are needed.
