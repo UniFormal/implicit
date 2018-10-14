@@ -1,6 +1,9 @@
 \subsection{Identifying Theories via Implicit Isomorphisms}\label{sec:inverse}
 
-In this section, we introduce several language extensions that introduce implicit isomorphisms.
+A common need in developing large libraries (both in formal and informal developments) is to identify two theories $S$ and $T$ via a canonical choice of isomorphisms.
+In these cases, it is often desirable to identify $S$ and $T$, e.g., when working with $S$, we want to be able to use $T$-syntax directly without having to apply an isomorphism.
+One of the major short-comings of formal theories over traditional informal developments is that formal systems usually need to spell out these isomorphisms everywhere.
+In this section, we show that implicit morphisms elegantly allow exactly that kind of intuitive identification.
 
 Note that because identity morphisms are implicit, our uniqueness requirement for implicit morphisms implies that two theories $S$ and $T$ must be isomorphic if there are implicit morphisms in both directions.
 Moreover, making a pair of isomorphisms implicit is well-formed if there are no other implicit morphisms between $S$ and $T$ yet.
@@ -58,7 +61,7 @@ We extend the theory $\cn{Group}$ from Ex.~\ref{syn:incl} with a theorem
 \begin{mmtcode}
 definitional InverseInvolution =
   include Group
-  inverse_invol : ∀[x] (x⁻¹)⁻¹≐x 	= (proof omitted)
+  inverse_invol : ∀[x] (x⁻¹)⁻¹≐x  =  (proof omitted)
 \end{mmtcode}
 \end{example}
 

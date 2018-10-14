@@ -15,61 +15,35 @@ In the above example, we would
 \end{compactitem}
 \medskip
 
-As a more complex example, we have built a hierarchy of theories between \cn{Band} and \cn{Semilattice}.
-\ednote{@DM: this is not quite the lattice from the Wikipedia page: it consists of the 3x3 square plus Bands at the top}
-All of these theories are of the form $t=\{\icl{\cn{Band}},\,a:\vdash F\}$, where $F$ is a universally quantified equational axiom.\footnote{All varieties of bands can be axiomatized in this way.}
-In particular, $\cn{SemiLattice}=\{\icl{\cn{Band}},\,a:\vdash \forall [x]\forall [y] x\circ y\doteq y\circ x\}$.
-Fig.~\ref{fig:bands} shows these theories.
+As a more complex example, we have formalized a hierarchy of theories between \cn{Band} and \cn{Semilattice}:
+\begin{center}
+\begin{tikzpicture}[xscale=2]
+  \node (s1) at (0,0) {$z\circ x\circ y\circ z\doteq  z\circ x\circ z\circ y\circ z$};
+  
+  \node (s2a) at (-1,-1) {$z\circ x\circ y\doteq  z\circ x\circ z\circ y$};
+  \node (s2b) at (1,-1) {$y\circ x\circ z\doteq  y\circ z\circ x\circ z$};
+  \draw[arrow] (s1) to (s2a) {};
+  \draw[arrow] (s1) to (s2b) {};
+  
+  \node (s3a) at (-2,-2) {$x\circ y\doteq  x\circ y\circ x$};
+  \node (s3b) at (0,-2) {$z\circ x\circ y\circ z\doteq  z\circ y\circ x\circ z$};
+  \node (s3c) at (2,-2) {$x\circ y\doteq  y\circ x\circ y$};
+  \draw[arrow] (s2a) to (s3a) {};
+  \draw[arrow] (s2a) to (s3b) {};
+  \draw[arrow] (s2b) to (s3b) {};
+  \draw[arrow] (s2b) to (s3c) {};
+  
+  \node (s4a) at (-1,-3) {$z\circ x\circ y\doteq  z\circ y\circ x$};
+  \node (s4b) at (1,-3) {$x\circ y\circ z\doteq  y\circ x\circ z$};
+  \draw[arrow] (s3a) to (s4a) {};
+  \draw[arrow] (s3b) to (s4a) {};
+  \draw[arrow] (s3b) to (s4b) {};
+  \draw[arrow] (s3c) to (s4b) {};
 
-There are various morphisms between them that describe the lattice structure of the corresponding varieties of bands.
-All of these map the constants from \cn{Band} to themselves and the axiom $a$ to a proof.%
-\footnote{Our formalization of the lattice of bands using implicit morphisms can be found at \url{https://gl.mathhub.info/MitM/smglom/blob/devel/source/algebra/bands.mmt}.}
-We make all of these morphisms implicit.
-It is straightforward to prove that the diagram commutes: any two morphisms are identical except for assignment for the axiom.
-Here, \mmt can discharge the proof obligation easily using proof irrelevance.
-
-\begin{figure}\begin{center}
-\begin{tikzpicture}[scale=1.5]
-  \node (s1) at (0,0) {$zxyz=zxzyz$};
-  
-  \node (s2a) at (-1,-1) {$zxy=zxzy$};
-  \node (s2b) at (1,-1) {$yxz=yzxz$};
-  \draw (s1) to (s2a) {};
-  \draw (s1) to (s2b) {};
-  
-  \node (s3a) at (-2,-2) {$xy=xyx$};
-  \node (s3b) at (0,-2) {$zxyz=zyxz$};
-  \node (s3c) at (2,-2) {$xy=yxy$};
-  \draw (s2a) to (s3a) {};
-  \draw (s2a) to (s3b) {};
-  \draw (s2b) to (s3b) {};
-  \draw (s2b) to (s3c) {};
-  
-  \node (s4a) at (-1.5,-3) {$zxy=zyx$};
-  \node (s4b) at (0,-3) {$xyx=x$};
-  \node (s4c) at (1.5,-3) {$xyz=yxz$};
-  \draw (s3a) to (s4a) {};
-  \draw (s3b) to (s4a) {};
-  \draw (s3b) to (s4b) {};
-  \draw (s3b) to (s4c) {};
-  \draw (s3c) to (s4c) {};
-  
-  
-  \node (s5a) at (-1.5,-4) {$xy=x$};
-  \node (s5b) at (0,-4) {$xy=yx$};
-  \node (s5c) at (1.5,-4) {$xy=y$};
-  \draw (s4a) to (s5a) {};
-  \draw (s4a) to (s5b) {};
-  \draw (s4b) to (s5a) {};
-  \draw (s4b) to (s5c) {};
-  \draw (s4c) to (s5b) {};
-  \draw (s4c) to (s5c) {};
-  
-  \node (s6) at (0,-5) {$x=y$};
-  \draw (s5a) to (s6) {};
-  \draw (s5b) to (s6) {};
-  \draw (s5c) to (s6) {};
-  
+  \node (s5) at (0,-4) {$x\circ y\doteq  y\circ x$};
+  \draw[arrow] (s4a) to (s5) {};
+  \draw[arrow] (s4b) to (s5) {};
+ 
   %\node[thy,inner sep=.3cm,fill=gray] (t1) at (0,0) {};
   %\node at (t1.north west) {$S$};
   %\node at (t1) {$D$};
@@ -79,13 +53,17 @@ Here, \mmt can discharge the proof obligation easily using proof irrelevance.
   %\node at (t2) {$C$};
   %\draw[view] (t1) to[out=10,in=170] node[above] {$\sigma$} (t2);
 \end{tikzpicture}
-
-%\includegraphics[width=0.6\textwidth]{bands}
 \end{center}
-\caption{The Lattice of Varieties of Bands}\label{fig:bands}
-\end{figure}
+All of these theories are of the form $t=\{\icl{\cn{Band}},\,a: F\}$, where $F$ is the formula given in the diagram above.%
+\footnote{All varieties of bands can be axiomatized in this way.}
+In particular, $\cn{SemiLattice}=\{\icl{\cn{Band}},\,a: \forall [x]\forall [y] x\circ y\doteq y\circ x\}$.
 
-%
+There are various morphisms between them that describe the lattice structure of the corresponding varieties of bands.
+All of these map the constants from \cn{Band} to themselves and the axiom $a$ to a proof.
+In our formalization, we make all of these morphisms implicit.%
+\footnote{Our formalization of the lattice of bands using implicit morphisms can be found at \url{https://gl.mathhub.info/MitM/smglom/blob/devel/source/algebra/bands.mmt}.}
+It is straightforward to prove that the diagram commutes: any two morphisms are identical except for assignment for the axiom, and these are provably equal due to proof irrelevance.
+
 %\begin{figure}
 %\begin{tabular}{c|c}
 %\begin{mmtcode}
