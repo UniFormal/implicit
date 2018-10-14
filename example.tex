@@ -1,6 +1,6 @@
-A common problem when definition modular theory hierarchies is that the most natural include-hierarchy for the most important theories is not necessarily the same as the most comprehensive hierarchy.
+A common problem when defining modular theory hierarchies is that the most natural include-hierarchy for the most important theories is not necessarily the same as the most comprehensive hierarchy.
 For example, Ex.~\ref{syn:incl} defines \cn{Group} with an include from \cn{Monoid}.
-Instead, we could include \cn{Monoid} into the the intermediate theory \cn{CancellationMonoid} and include that into \cn{Group}.
+Instead, we could include \cn{Monoid} into the intermediate theory \cn{CancellationMonoid} and include that into \cn{Group}.
 This change is not possible in retrospect --- changing the theory hierarchy (which is one of the most fundamental structures of a library) usually presents an insurmountable refactoring problem.
 So instead we could systematically build a hierarchy that uses every intermediate theory (as done in \cite{mathscheme}).
 But this yields a very deep and complex hierarchy that is hard to navigate for casual users.
@@ -27,7 +27,59 @@ It is straightforward to prove that the diagram commutes: any two morphisms are 
 Here, \mmt can discharge the proof obligation easily using proof irrelevance.
 
 \begin{figure}\begin{center}
-\includegraphics[width=0.6\textwidth]{bands}\end{center}
+\begin{tikzpicture}[scale=1.5]
+  \node (s1) at (0,0) {$zxyz=zxzyz$};
+  
+  \node (s2a) at (-1,-1) {$zxy=zxzy$};
+  \node (s2b) at (1,-1) {$yxz=yzxz$};
+  \draw (s1) to (s2a) {};
+  \draw (s1) to (s2b) {};
+  
+  \node (s3a) at (-2,-2) {$xy=xyx$};
+  \node (s3b) at (0,-2) {$zxyz=zyxz$};
+  \node (s3c) at (2,-2) {$xy=yxy$};
+  \draw (s2a) to (s3a) {};
+  \draw (s2a) to (s3b) {};
+  \draw (s2b) to (s3b) {};
+  \draw (s2b) to (s3c) {};
+  
+  \node (s4a) at (-1.5,-3) {$zxy=zyx$};
+  \node (s4b) at (0,-3) {$xyx=x$};
+  \node (s4c) at (1.5,-3) {$xyz=yxz$};
+  \draw (s3a) to (s4a) {};
+  \draw (s3b) to (s4a) {};
+  \draw (s3b) to (s4b) {};
+  \draw (s3b) to (s4c) {};
+  \draw (s3c) to (s4c) {};
+  
+  
+  \node (s5a) at (-1.5,-4) {$xy=x$};
+  \node (s5b) at (0,-4) {$xy=yx$};
+  \node (s5c) at (1.5,-4) {$xy=y$};
+  \draw (s4a) to (s5a) {};
+  \draw (s4a) to (s5b) {};
+  \draw (s4b) to (s5a) {};
+  \draw (s4b) to (s5c) {};
+  \draw (s4c) to (s5b) {};
+  \draw (s4c) to (s5c) {};
+  
+  \node (s6) at (0,-5) {$x=y$};
+  \draw (s5a) to (s6) {};
+  \draw (s5b) to (s6) {};
+  \draw (s5c) to (s6) {};
+  
+  %\node[thy,inner sep=.3cm,fill=gray] (t1) at (0,0) {};
+  %\node at (t1.north west) {$S$};
+  %\node at (t1) {$D$};
+  %\node[thy,inner sep=.5cm,fill=lightgray] (s2) at (2,0) {};
+  %\node[thy,inner sep=.3cm,fill=gray] (t2) at (2,0) {};
+  %\node at (t2.north west) {$T$};
+  %\node at (t2) {$C$};
+  %\draw[view] (t1) to[out=10,in=170] node[above] {$\sigma$} (t2);
+\end{tikzpicture}
+
+%\includegraphics[width=0.6\textwidth]{bands}
+\end{center}
 \caption{The Lattice of Varieties of Bands}\label{fig:bands}
 \end{figure}
 

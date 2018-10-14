@@ -21,7 +21,22 @@ We make the following extension to syntax and semantics:
   \item In that case, we define $r\in\IMo{s}{t}$ and $r^{-1}\in\Mo{t}{s}$.
 \end{compactitem}
 
-\ednote{@DM: add example, e.g., a definition of Monoid that uses different names}
+\begin{example}
+	Consider a variation of the theory $\cn{Monoid}$ from \autoref{syn:incl} in a different library:
+	\begin{mmtcode}
+Monoid2 =
+  M: type
+  connective : M ⟶ M ⟶ M	 # 1 ∘ 2 
+  neutral	: M
+\end{mmtcode}
+This theory is isomorphic to the previously introduced theory $\cn{Monoid}$ under the trivial renaming
+	\begin{mmtcode}
+Monoids : Monoid2 -> Monoid =
+  M 		:= U
+  connective 	:= op 
+  neutral	:= unit
+\end{mmtcode}
+\end{example}
 
 \paragraph{Definitional Extensions}
 We say that the named theory $t$ is a \textbf{definitional extension} of $S$ if $t=S$ or the body of $t$ contains
@@ -29,7 +44,14 @@ We say that the named theory $t$ is a \textbf{definitional extension} of $S$ if 
  \item only constant declarations with definiens,
  \item only include declarations of theories that are definitional extensions of $S$.
 \end{compactitem}
-\ednote{@DM: give example that extends Group with the theorem $(x^{-1})^{-1}\doteq x$ (with omitted proof)}
+\begin{example}
+	Imagine extending the theory $\cn{Group}$ from \autoref{syn:incl} by provable theorems:
+		\begin{mmtcode}
+Group_Theorems =
+  include Group
+  inverse_idem : ⊦∀[x] (x⁻¹)⁻¹≐x 	= (proof)
+\end{mmtcode}
+\end{example}
 
 If $t$ is a definitional extension of $S$, it is easy to prove that $t$ and $S$ are isomorphic: both isomorphisms map all constants without definiens to themselves. In particular, the isomorphism $S\to t$ maps $S$-constants to themselves and expands the definiens of all other constants.
 
@@ -38,8 +60,18 @@ We make the following extension to syntax and semantics:
   \item An include declaration $\icl{s}$ of a named theory $s$ inside theory $t$ may carry the attribute \keyword{definitional}.
   \item In that case, we define $\id{s}\in\IMo{t}{s}$ (in addition to the implicit morphism $\id{t}\in\IMo{s}{t}$ which is induced by the inclusion).
 \end{compactitem}
+\begin{example}
+	We adapt our theory $\cn{Group\_Theorems}$ with the newly introduced keyword, which allows us to extend $\cn{Group}$ directly while having the new theorem $\cn{inverse\_idem}$ available:
+		\begin{mmtcode}
+Group_Theorems =
+  definitional include Group
+  inverse_idem : ⊦∀[x] (x⁻¹)⁻¹≐x 	= (proof)
 
-\ednote{@DM: repeat previous example now with \keyword{definitional} and give another definitional extensions of Group; this new extension may already use the implicitly available definition of the first extension}
+More_Theorems =
+  include ?Group
+  some_other_theorem : ⊦ ??	= (proof using inverse_idem)
+\end{mmtcode}
+\end{example}
 
 \begin{remark}[Conservative Extensions]
 A definitional extension is a special case of a conservative extension.
@@ -52,13 +84,18 @@ But we cannot make the retractions implicit morphisms in general because they ar
 If we have isomorphisms $m:s\to t$ and $n:t\to s$, we simply spell them out in morphism declarations and add the keyword \keyword{implicit} to both.
 This requires no language extensions.
 
-\ednote{@DM: add the isomorphism of DG2G}
 \begin{example}\label{group:iso}
-We give the morphism $\cn{G2DG}$.
-
+Having declared the morphism $\cn{DG2G}$ (as in \autoref{ex:dg2g}) implicit, we do the same with the reverse morphism  $\cn{G2DG}$:
+\begin{mmtcode}
+implicit G2DG : Group -> DivisionGroup =
+  U := U
+  op := [a,b] a / ((unit/unit) / b) 
+  unit := unit/unit
+  inverse := [a] (unit/unit) / a
+\end{mmtcode}
 \end{example}
 
-While the first one of these declarations is straightforward, the second one requires checking that $m$ and $n$ are actually isomorphism.
+While the first one of these isomorphism declarations is straightforward, the second one requires checking that $m$ and $n$ are actually isomorphisms.
 Otherwise, the uniqueness condition would be violated.
 Thus, we have to check $m;n=\id{s}$ and $n;m=\id{t}$.
 In general, the equality of two morphisms $f,g:A\to B$ is equivalent to $\vdash_B f(c)=g(c)$ for all $c:E\in\flt{A}$.

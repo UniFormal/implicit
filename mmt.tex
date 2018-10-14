@@ -104,6 +104,11 @@ Therefore, we will make flattening a partial function, i.e., $\flt{X}$ is undefi
 
 \paragraph{Logics in \mmt}
 \ednote{explain that we use a fixed instance of MMT which adds LF and FOL; only relevant for examples}
+\mmt itself is foundation independent and parmetric in a set of typing rules. We omit the details on implementing type systems and logical frameworks in \mmt, and will instead assume theories for the logical framework LF and an implementation of first-order logic for the examples in the remainder of this paper.
+
+Specifically, we assume a theory $\cn{LF}$ that implements the dependently-typed lambda calculus LF. This theory provides symbols for dependent function types $\prod_{c:A}B(x)$ (in surface syntax: \lstinline|{x:A}B x|), simple function types $A\to B$ (as abbreviation for $\prod_{\_:A}B$, lambda abstractions $\lambda x:A.\; t(x)$ (in surface syntax: \lstinline|[x:A] t x|) and function application $f a$.
+
+The theory \cn{LF} is used as a meta-theory for a theory \cn{FOL} implementing first-order logic with equality. This theory provides symbols for the quantifiers $\forall$ and $\exists$ (implemented via higher-order abstract syntax, i.e. the proposition $\forall x.\; P(x)$ is written as $\forall$\lstinline|[x:U]P x| for a fixed type $U$), equality $\doteq$ and the usual logical connectives $\neg,\wedge,\vee$, etc.
 
 \subsection{Syntax}
 
@@ -126,22 +131,22 @@ We omit the remaining productions for expressions here, which allow forming comp
 The (flat) theories $\cn{Group}$ and $\cn{DivGroup}$ from the introduction are:
 \begin{mmtcode}
 Group =
-  U	: type
+  U		: type
   op		: U ⟶ U ⟶ U	 # 1 ∘ 2 
   unit		: U
-  inverse : U ⟶ U   # 1 ⁻¹ 
+  inverse 	: U ⟶ U   # 1 ⁻¹ 
   // axioms omitted
 \end{mmtcode}
 \begin{mmtcode}
 DivisionGroup =
-  U : type
-  div : U ⟶ U ⟶ U  # 1 / 2 
-  unit : U
+  U 	: type
+  div 	: U ⟶ U ⟶ U  # 1 / 2 
+  unit 	: U
   // axioms omitted
 \end{mmtcode}
 Here we use \lstinline|# <not>| to indicate notations; these are part of the language supported by \mmt but omitted from the formal grammar above because we only need them here to present legible examples.
 
-Moreover, we use a few constants from a type systems\ednote{finish}$\forall,\doteq$ etc.
+Moreover, we use the constants from the theories $\cn{LF}$ and $\cn{FOL}$ described above.
 \end{example}
 
 At this point, this grammar only allows forming flat theories, i.e., $\Thy=\thy$.
