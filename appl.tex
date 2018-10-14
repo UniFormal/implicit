@@ -173,6 +173,63 @@ With implicit morphisms, we can solve this problem by making only the following 
   \item We add an implicit morphism $s\to t$ that maps $s?n$ to $r'?n$.
 \end{compactenum}
 Now $t$ has the desired new structure.
-But, all old references to $s?n$ stay well-formed so that no global changes are needed.
+But, all old references to $s?n$ stay well-formed so that no global changes are needed, as in \autoref{fig:refac}.
 
-\ednote{@DM: maybe make a tikz for the before/after situations}
+\begin{figure}\begin{center}
+
+\begin{minipage}[t]{0.4\textwidth}
+\begin{center}
+Before:
+
+\begin{tikzpicture}[scale=1.5]
+  \node (t) at (0,0) {$t$};
+  \node (r) at (-1,-2) {$r$};
+  \node (s) at (1,-1) {$s$};
+  \draw[right hook-latex] (r) to (t) {};
+  \draw[right hook-latex] (s) to (t) {};
+  
+  %\node[thy,inner sep=.3cm,fill=gray] (t1) at (0,0) {};
+  %\node at (t1.north west) {$S$};
+  %\node at (t1) {$D$};
+  %\node[thy,inner sep=.5cm,fill=lightgray] (s2) at (2,0) {};
+  %\node[thy,inner sep=.3cm,fill=gray] (t2) at (2,0) {};
+  %\node at (t2.north west) {$T$};
+  %\node at (t2) {$C$};
+  %\draw[view] (t1) to[out=10,in=170] node[above] {$\sigma$} (t2);
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+\begin{minipage}[t]{0.4\textwidth}
+\begin{center}
+After:
+
+\begin{tikzpicture}[scale=1.5]
+  \node (t) at (0,0) {$t$};
+  \node (rp) at (-1,-1) {$r'$};
+  \node (s) at (1,-1) {$s$};
+  
+  \node (r) at (-1,-2) {$r$};
+  \node (sp) at (1,-2) {$s'$};
+  \draw[right hook-latex] (r) to (rp) {};
+  \draw[right hook-latex] (sp) to (s) {};
+  
+  \draw[right hook-latex] (rp) to (t) {};
+  \draw[right hook-latex] (sp) to (t) {};
+  
+  \draw[arrow] (s) to (t);
+  
+  %\node[thy,inner sep=.3cm,fill=gray] (t1) at (0,0) {};
+  %\node at (t1.north west) {$S$};
+  %\node at (t1) {$D$};
+  %\node[thy,inner sep=.5cm,fill=lightgray] (s2) at (2,0) {};
+  %\node[thy,inner sep=.3cm,fill=gray] (t2) at (2,0) {};
+  %\node at (t2.north west) {$T$};
+  %\node at (t2) {$C$};
+  %\draw[view] (t1) to[out=10,in=170] node[above] {$\sigma$} (t2);
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\end{center}
+\caption{An Example for Transparent Refactoring}\label{fig:refac}
+\end{figure}
