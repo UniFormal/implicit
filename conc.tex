@@ -32,7 +32,7 @@ Contrary to \mmt, a conversion is only available if explicitly imported into the
 Moreover, Scala does not chain conversions, i.e, the composition of implicit morphisms is not implicit.
 Scala's limitations are intentional: Their goal is to prevent programmers from overusing implicit conversions because that can be very confusing to readers.
 
-These limitations are lifted in \mmt's conversions can only act between theories anyway.
+These limitations are lifted in \mmt's conversions, since they can only act between theories anyway.
 Thus, their potential to confuse is smaller.
 Moreover, the use of qualified identifiers in \mmt means that readers can always tell where an identifier is implicitly-included from, and the \mmt IDE can always show the implicit morphism along which it is imported.
 
