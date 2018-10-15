@@ -168,9 +168,9 @@ such that a morphism declaration contains exactly one assignment $c:=o$ for each
 We give the morphism \cn{DG2G} between the theories from Ex.~\ref{syn:incl}:
 \begin{mmtcode}
 DG2G : DivisionGroup -> Group =
-  U := U
-  div := [a,b] a ∘ (b⁻¹) 
-  unit := unit
+  U 	:= U
+  div 	:= [a,b] a ∘ (b⁻¹) 
+  unit 	:= unit
   // assignments to axioms omitted
 \end{mmtcode}
 It maps the universe and unit of a division group to the corresponding notions of a group.
@@ -210,8 +210,8 @@ This allows writing the theory $\cn{Group}$ from Ex.~\ref{ex:thgroup} by extendi
 Again omitting all axioms, this looks as follows:
 \begin{mmtcode}
 Monoid =
-  U: type
-  op : U ⟶ U ⟶ U	 # 1 ∘ 2 
+  U 	: type
+  op 	: U ⟶ U ⟶ U	 # 1 ∘ 2 
   unit	: U
 Group =
   include Monoid

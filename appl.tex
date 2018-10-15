@@ -28,8 +28,8 @@ We make the following extension to syntax and semantics:
 Consider a variation of the theory $\cn{Monoid}$ from Ex.~\ref{syn:incl} in a different library:
 \begin{mmtcode}
 Monoid2 =
-  M: type
-  connective : M ⟶ M ⟶ M	 # 1 ∘ 2 
+  M 		: type
+  connective 	: M ⟶ M ⟶ M	 # 1 ∘ 2 
   neutral	: M
 \end{mmtcode}
 This theory is isomorphic to the previously introduced theory \cn{Monoid} under the trivial renaming
@@ -80,10 +80,10 @@ This requires no language extensions.
 Having declared the morphism $\cn{DG2G}$ (as in Ex.~\ref{ex:dg2g}) implicit, we do the same with the reverse morphism  $\cn{G2DG}$:
 \begin{mmtcode}
 implicit G2DG : Group -> DivisionGroup =
-  U := U
-  op := [a,b] a/(unit/b) 
-  unit := unit
-  inverse := [a] unit/a
+  U 		:= U
+  op 		:= [a,b] a/(unit/b) 
+  unit 		:= unit
+  inverse 	:= [a] unit/a
 \end{mmtcode}
 \end{example}
 
