@@ -3,7 +3,7 @@ The need for implicit conversions has been recognized in many formal systems.
 In all cases, similar uniqueness constraints are employed as in ours.
 
 \textbf{Type-level} conversions are functions between types such as the conversion from natural numbers to integers.
-\textbf{Theory-level} conversions morphisms between theories, like in this paper.
+\textbf{Theory-level} conversions are morphisms between theories, like in this paper, or similar constructs.
 The latter can be seen as a special case of the former: if every theory is seen as the type of its models (as in \cite{MRK:modelsof:18}), then reduction along an implicit morphism $S\to T$ induces a conversion from $T$-models to $S$-models.
 Type-level conversions are present in many systems, e.g., the Coq proof assistant \cite{coq} or the Scala programming language.
 %In both cases, this includes theory-level conversions between the respective analogues of theories
@@ -12,8 +12,8 @@ This significantly reduces the complexity and permits an elegant logic-independe
 
 Some formal systems support theory-level conversions without explicitly using theory morphisms.
 This is common in systems that use type classes as an analogue to theories.
-For example, the \texttt{sublocale} declarations of the proof assistant Isabelle \cite{isabelle_locales} or the \texttt{deriving} declarations of the programming language Haskell can be seen as \textbf{anonymous} implicit morphisms.
-Making theory morphisms primitive objects, as in our case, yields a simpler and more expressive implicit-conversion-system at the price of having an additional primitive concept.
+For example, the \texttt{sublocale} declarations of the proof assistant Isabelle \cite{isabelle_locales} or the \texttt{deriving} declarations of the programming language Haskell can be seen as implicit morphisms even though no primitive concept of morphism objects is employed.
+Our implicit morphisms yield a simpler and more expressive theory-level conversion system at the price of having an additional primitive concept.
 % Löh paper on deriving via not published yet
 %\cite{gonthier_packaging}
 
@@ -41,9 +41,8 @@ In contrast, the much simpler feature of implicit morphisms achieves very simila
 Future work will focus on utilizing and evaluating implicit morphisms in large libraries, i.e., diagrams with thousands of theories and as many implicit morphisms as possible.
 
 In doing so, we will pay particular attention to some problems that implicit conversions can cause at large scales.
-Users can be confused when implicit conversions are applied that they are not aware of.
-Different users may also have different preferences for which conversions should be implicit.
-And most critically, different developments may be incompatible if they introduce different implicit morphisms between the same theories.
+Users can be confused when implicit conversions are applied that they are not aware of, and different users may also have different preferences for which conversions should be implicit.
+Moreover, critically, different developments may be incompatible if they introduce different implicit morphisms between the same theories.
 For those reasons, Scala, for example, only applies implicit conversions that are imported into the current namespace.
 
 We anticipate that these problems will lead to an evolution of our solution that allows more localized control over which morphisms are implicit.

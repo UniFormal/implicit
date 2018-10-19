@@ -1,7 +1,7 @@
 A common problem when defining modular theory hierarchies is that the most natural include-hierarchy for the most important theories is not necessarily the same as the most comprehensive hierarchy.
 For example, Ex.~\ref{syn:incl} defines \cn{Group} with an include from \cn{Monoid}.
 Instead, we could include \cn{Monoid} into the intermediate theory \cn{CancellationMonoid} and include that into \cn{Group}.
-This change is not possible in retrospect --- changing the theory hierarchy (which is one of the most fundamental structures of a library) usually presents an insurmountable refactoring problem.
+This change is not easy in retrospect --- changing the theory hierarchy (which is one of the most fundamental structures of a library) usually presents a very expensive refactoring problem.
 So instead we could systematically build a hierarchy that uses every intermediate theory (as done in \cite{mathscheme}).
 But this yields a very deep and complex hierarchy that is hard to navigate for casual users.
 Moreover, it does not protect us from later on discovering yet another intermediate theory that should have been added.
@@ -15,7 +15,8 @@ In the above example, we would
 \end{compactitem}
 \medskip
 
-As a more complex example, we have formalized a hierarchy of theories between \cn{Band} and \cn{Semilattice}:
+As a more complex case study, we have used our implementation of implicit morphisms in \mmt to formalize a hierarchy of theories between \cn{Band} and \cn{Semilattice}:% 
+\footnote{Our formalization can be found at \url{https://gl.mathhub.info/MMT/examples/blob/devel/source/bands.mmt}.}
 \begin{center}
 \begin{tikzpicture}[xscale=2]
   \node (s1) at (0,0) {$z\circ x\circ y\circ z\doteq  z\circ x\circ z\circ y\circ z$};
@@ -55,14 +56,12 @@ As a more complex example, we have formalized a hierarchy of theories between \c
 \end{tikzpicture}
 \end{center}
 All of these theories are of the form $t=\{\icl{\cn{Band}},\,a: F\}$, where $F$ is the formula given in the diagram above.%
-\footnote{All varieties of bands can be axiomatized in this way.}
+%\footnote{All varieties of bands can be axiomatized in this way.}
 In particular, $\cn{SemiLattice}=\{\icl{\cn{Band}},\,a: \forall [x]\forall [y] x\circ y\doteq y\circ x\}$.
 
-There are various morphisms between them that describe the lattice structure of the corresponding varieties of bands.
-All of these map the constants from \cn{Band} to themselves and the axiom $a$ to a proof.
-In our formalization, we make all of these morphisms implicit.%
-\footnote{Our formalization of the lattice of bands using implicit morphisms can be found at \url{https://gl.mathhub.info/MMT/examples/blob/devel/source/bands.mmt}.}
-It is straightforward to prove that the diagram commutes: any two morphisms are identical except for assignment for the axiom, and these are provably equal due to proof irrelevance.
+The diagram above gives all morphisms between them that describe the lattice structure of the corresponding varieties of bands, all of which map the constants from \cn{Band} to themselves and the axiom $a$ to a proof.
+In our formalization, we make all of these morphisms implicit.
+It is straightforward to prove that the diagram commutes: any two morphisms are identical except for the assignment to the axiom $a$, and these are equal due to proof irrelevance.
 
 %\begin{figure}
 %\begin{tabular}{c|c}

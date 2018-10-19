@@ -1,11 +1,12 @@
 \subsection{Identifying Theories via Implicit Isomorphisms}\label{sec:inverse}
 
 A common need in developing large libraries (both in formal and informal developments) is to identify two theories $S$ and $T$ via a canonical choice of isomorphisms.
-In these cases, it is often desirable to identify $S$ and $T$, e.g., when working with $S$, we want to be able to use $T$-syntax directly without having to apply an isomorphism.
-One of the major short-comings of formal theories over traditional informal developments is that formal systems usually need to spell out these isomorphisms everywhere.
+In these cases, it is often desirable to use $S$-syntax and $T$-syntax interchangeably.
+But one of the major short-comings of formal theories over traditional informal developments is that formal systems usually need to spell out these isomorphisms everywhere.
 In this section, we show that implicit morphisms elegantly allow exactly that kind of intuitive identification.
 
-Note that because identity morphisms are implicit, our uniqueness requirement for implicit morphisms implies that two theories $S$ and $T$ must be isomorphic if there are implicit morphisms in both directions.
+In the sequel, we present several ways to obtain implicit isomorphisms conveniently.
+In general, note that because identity morphisms are implicit, our uniqueness requirement for implicit morphisms implies that two theories $S$ and $T$ must be isomorphic if there are implicit morphisms in both directions.
 Moreover, making a pair of isomorphisms implicit is well-formed if there are no other implicit morphisms between $S$ and $T$ yet.
 
 \paragraph{Renamings}
@@ -20,7 +21,7 @@ The inverse morphisms contains the flipped assignments $c':=c$.
 We make the following extension to syntax and semantics:
 \begin{compactitem}
   \item A morphism declaration $r:s\to t=\{\ldots\}$ may carry the attribute \keyword{renaming}.
-  \item This is well-formed if there are no implicit morphism between $s$ and $t$ yet.
+  \item This is allowed if there are no implicit morphism between $s$ and $t$ yet.
   \item In that case, we define $r\in\IMo{s}{t}$ and $r^{-1}\in\Mo{t}{s}$.
 \end{compactitem}
 
@@ -28,47 +29,46 @@ We make the following extension to syntax and semantics:
 Consider a variation of the theory $\cn{Monoid}$ from Ex.~\ref{syn:incl} in a different library:
 \begin{mmtcode}
 Monoid2 =
-  M 		: type
-  connective 	: M ⟶ M ⟶ M	 # 1 ∘ 2 
-  neutral	: M
+  M          : type
+  connective : M $\to$ M $\to$ M	 # 1 $\circ$ 2 
+  neutral    : M
 \end{mmtcode}
 This theory is isomorphic to the previously introduced theory \cn{Monoid} under the trivial renaming
 	\begin{mmtcode}
 renaming MonoidRen : Monoid2 -> Monoid =
-  M 		:= U
-  connective 	:= op 
-  neutral	:= unit
+  M          := U
+  connective := op 
+  neutral    := unit
 \end{mmtcode}
 \end{example}
 
 \paragraph{Definitional Extensions}
-We say that the named theory $t$ is a \textbf{definitional extension} of $S$ if $t=S$ or the body of $t$ contains
+We say that the named theory $T$ is a \textbf{definitional extension} of $S$ if $T=S$ or the body of $T$ contains
 \begin{compactitem}
  \item only constant declarations with definiens,
  \item only include declarations of theories that are definitional extensions of $S$.
 \end{compactitem}
 
-If $t$ is a definitional extension of $S$, it is easy to prove that $t$ and $S$ are isomorphic: both isomorphisms map all constants without definiens to themselves. In particular, the isomorphism $S\to t$ maps $S$-constants to themselves and expands the definiens of all other constants.
+If $T$ is a definitional extension of $S$, it is easy to prove that $t$ and $S$ are isomorphic: both isomorphisms map all constants without definiens to themselves. In particular, the isomorphism $S\to T$ maps $S$-constants to themselves and expands the definiens of all other constants.
 
 We make the following extension to syntax and semantics:
 \begin{compactitem}
-  \item An include declaration $\icl{s}$ of a named theory $s$ inside theory $t$ may carry the attribute \keyword{definitional}.
-  \item In that case, we define $\id{s}\in\IMo{t}{s}$ (in addition to the implicit morphism $\id{t}\in\IMo{s}{t}$ which is induced by the inclusion).
+  \item An include declaration $\icl{S}$ of a named theory $S$ inside theory $T$ may carry the attribute \keyword{definitional}.
+  \item In that case, we define $\id{S}\in\IMo{T}{S}$ (in addition to the implicit morphism $\id{T}\in\IMo{S}{T}$ that is induced by the inclusion).
 \end{compactitem}
 
 \begin{example}[Extension with a Theorem]
 We extend the theory $\cn{Group}$ from Ex.~\ref{syn:incl} with a theorem
 \begin{mmtcode}
-definitional InverseInvolution =
-  include Group
-  inverse_invol : ∀[x] (x⁻¹)⁻¹≐x  =  (proof omitted)
+InverseInvolution =
+  definitional include Group
+  inverse_invol : $\forall$[x] (x$^{-1}$)$^{-1}$$\doteq$ x  =  (proof omitted)
 \end{mmtcode}
 \end{example}
 
 \begin{remark}[Conservative Extensions]
 A definitional extension is a special case of a conservative extension.
-More generally, all retractable extensions are conservative, i.e., all extensions $S\harr T$ such that there is a morphism $r:T\to S$ such that $r$ is the identity on $S$.
-
+More generally, all retractable extensions are conservative, i.e., all extensions $S\harr T$ such that there is a morphism $r:T\to S$ that is the identity on $S$.
 But we cannot make the retractions implicit morphisms in general because they are not necessarily isomorphisms.
 \end{remark}
 
@@ -79,66 +79,65 @@ This requires no language extensions.
 \begin{example}\label{group:iso}
 Having declared the morphism $\cn{DG2G}$ (as in Ex.~\ref{ex:dg2g}) implicit, we do the same with the reverse morphism  $\cn{G2DG}$:
 \begin{mmtcode}
-implicit G2DG : Group -> DivisionGroup =
-  U 		:= U
-  op 		:= [a,b] a/(unit/b) 
-  unit 		:= unit
-  inverse 	:= [a] unit/a
+implicit G2DG : Group -> DivGroup =
+  U       := U
+  op      := [a,b] a/(unit/b) 
+  unit    := unit
+  inverse := [a] unit/a
 \end{mmtcode}
 \end{example}
 
-While the first one of these isomorphism declarations is straightforward, the second one requires checking that $m$ and $n$ are actually isomorphisms.
+While making one of these isomorphisms implicit is straightforward, doing both requires checking that $m$ and $n$ are actually isomorphisms.
 Otherwise, the uniqueness condition would be violated.
 Thus, we have to check $m;n=\id{s}$ and $n;m=\id{t}$.
-In general, the equality of two morphisms $f,g:A\to B$ is equivalent to $\vdash_B f(c)=g(c)$ for all $c:E\in\flt{A}$.
+In general, the equality of two morphisms $f,g:A\to B$ is equivalent to $\vdash_B f(c)=g(c)$ for all $(c:E)\in\flt{A}$.
 Thus, if equality of expressions is decidable in the logic that \mmt is instantiated with, then \mmt can check this directly.
 
 However, this does not work in practice.
-Already elementary examples require stronger, undecidable equality relations are used:
+Already elementary examples require stronger, undecidable equality relations:
 
 \begin{example}
 Consider the isomorphism from Ex.~\ref{group:iso}.
-The result of mapping $x\circ y$ from $\cn{Group}$ to $\cn{DivGroup}$ and back is $x\circ(unit\circ y^{-1})^{-1}$.
+The result of mapping $x\circ y$ from $\cn{Group}$ to $\cn{DivGroup}$ and back is $x\circ(\cn{unit}\circ y^{-1})^{-1}$.
 Clearly, the group axioms imply that this is equal to $x\circ y$.
-But formally that requires working with the undecidable equality of first-order logic.
+But formally, that requires working with the undecidable equality of first-order logic.
 \end{example}
 
-Therefore, in our running example, we only make one of the two isomorphisms implicit.
+Therefore, in our running example, we can only make one of the two isomorphisms implicit at this point.
 
 In the sequel, we design a general solution to this problem.
 It allows systematically proving the equality of two morphisms and using that to make both isomorphisms implicit.
-This is novel work, but it requires significant prerequisites and is only peripherally related to implicit morphisms.
+This is novel work that requires significant prerequisites and is only peripherally related to implicit morphisms.
 Therefore, we only sketch the idea and leave the details to future work.
 
 We add a language feature to \mmt to prove equalities between morphisms:
 We add the productions
 \begin{grammar}
 Dia   & \rep{(TDec \alt MDec\alt MEq)}  &\\
-MEq   & \keyword{equal} M=M:T\to T by \{\rep{Ass}\} &\\
+MEq   & \keyword{equal} M=M:T\to T \keyword{by} \{\rep{Ass}\} &\\
 \end{grammar}
 
 %Firstly, the intuition of $\keyword{equality} T = \{c:=E,\ldots\}$ is that it provides to every base type $c:\type$ of $T$ a judgment $E:c\to c\to \type$ that defines the $T$-specific equality relation for objects of type $c$.
 %Technically, this must be a binary logical relation in the sense of \cite{RS:logrels:12} on $\id{T}$.
 %As described in \cite{RS:logrels:12}, this induces an equality predicate $\cn{Equal}_E:E\to E\to \type$ on every type $E$.
 
-We define the declaration $M=N:S\to T by \{\sigma\}$ to be well-formed iff
+We define the declaration $M=N:S\to T \keyword{by} \{\sigma\}$ to be well-formed iff
 \begin{compactitem} 
   \item $M:S\to T$ and $N:S\to T$ are well-formed morphisms
   \item $\sigma$ contains exactly one assignment $c:=p$ for every $(c:E)\in\flt{S}$
   \item for each of these assignments $c:=p$, the term $p$ is a proof of $\vdash_T M(c)=N(c)$.
 \end{compactitem}
 
-To make $m$ and $n$ from above implicit isomorphisms, we have to do three things: define $m$ and $n$, prove the equalities of $m;n=\id{s}$ and $n;m=\id{t}$, and make $m$ and $n$ implicit.
-Note that we cannot make both $m$ and $n$ implicit right away because that is only well-formed after proving the equalities.)
-Thus, we define a new attribute \keyword{implicit-later}, which states that a morphism should be considered implicit as soon as subsequent equality proves make it well-formed to do so.
-
 \begin{example}[Isomorphisms]
-We can now add declarations
+With the above extension in place, we can make both isomorphisms $m$ and $n$ from above implicit:
  \[\keyword{implicit}:\cn{DG2G}:\cn{DivGroup}\to\cn{Group}=\text{(as above)}\]
  \[\keyword{implicit-later}:\cn{G2DG}:\cn{Group}\to\cn{DivGroup}=\text{(as above)}\]
  \[\keyword{equal}\cn{G2DG};\cn{DG2G}=\id{\cn{Group}}:\cn{Group}\to\cn{Group}=\text{(omitted)}\]
  \[\keyword{equal}\cn{DG2D};\cn{G2DG}=\id{\cn{DivGroup}}:\cn{DivGroup}\to\cn{DivGroup}=\text{(omitted)}\]
 where the isomorphisms are as above and we omit all the equality proofs.
+
+Note that we cannot mark \cn{G2DG} as \keyword{implicit} because that is only well-formed after proving the equalities.
+So we use the new attribute \keyword{implicit-later}, which states that a morphism should be considered as implicit as soon as subsequent equality proofs make it well-formed to do so.
 \end{example}
 
 \subsection{Fine-Granular and Flexible Theory Hierarchies}
@@ -148,18 +147,17 @@ where the isomorphisms are as above and we omit all the equality proofs.
 
 A major drawback of using modular theories is that it can preclude transparent refactoring.
 For example, consider a theory $t=\{\icl{r},\icl{s}\}$, and assume we want to move a constant declaration $D$ for the name $n$ from $r$ to $s$.
-Thus, the change to should be straightforward as it does not change the semantics of $t$.
+This change to should be straightforward as it does not change the semantics of $t$.
 
 However, this is not a local change.
 It also requires updating every qualified reference from $r?n$ to $s?n$.
-Such references can occur anywhere where $t$ is used.
-That may include theories that the person who does the refactoring does not know or does not have access to.
 Even if the source files always use the unqualified reference $n$ (because the checker is smart enough to dynamically disambiguate them), this still requires a global rebuild to reach a consistent state again.
+But such references can occur anywhere where $t$ is used, and that may include files that the person who does the refactoring does not know or does not have access to.
 
 With implicit morphisms, we can solve this problem by making only the following local changes:
 \begin{compactenum}
   \item We rename $s$ to $s'$.
-  \item We delete the declaration $n:E$ from $s'$.
+  \item We delete the declaration $D$ from $s'$.
   \item We create new theories $r'=\{\icl{r},\,D\}$ and $s=\{\icl{s'},D\}$.
   \item We change $t$ to $t=\{\icl{r'},\icl{s'}\}$.
   \item We add an implicit morphism $s\to t$ that maps $s?n$ to $r'?n$.
