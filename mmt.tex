@@ -19,8 +19,8 @@ Building large morphism is as important as building large theories: for example,
 \end{modexp}
 
 \paragraph{Flat Modules}
-\textbf{Flat theories} are lists of declarations $c:E[=e]$ where $E$ and $e$ are expressions, and the latter is optional.
-We write $\dom{T}$ for the set of constant identifiers $c$ in $\flt{T}$.
+\textbf{Flat theories} are lists of constant declarations $c:E[=e]$ where $E$ and $e$ are expressions, and the latter is optional.
+We write $\dom{T}$ for the set of constant identifiers $c$ in $T$.
 Every theory induces the set $\Exp{T}$ for the set of closed \textbf{expressions} using only the symbols $c\in\dom{T}$.
 Constant declarations subsume virtually all basic declarations common in formal systems such as type/function/predicate symbols, axioms, theorems, inference rules, etc.
 In particular, theorems can be represented via the propositions-as-types correspondence as declarations $c:F=P$, which establish theorem $F$ via proof $P$.
@@ -32,11 +32,11 @@ Every morphism $M$ induces a \textbf{homomorphic extension} $M(-):\Exp{S}\to\Exp
 A \textbf{diagram} consists of a set of theory and morphism declarations.
 \begin{nomodexp}
 For a given diagram, we write $\Thy$ for the set of declared \textbf{theories}.
-And we write $\Mo{S}{T}$ for the set of \textbf{morphisms} defined by
+For theories $S,T\in\Thy$, we write $\Mo{S}{T}$ for the set of \textbf{morphisms} defined by
 \begin{compactitem}
- \item for every declaration $m:S\to T=\{\sigma\}$, we have $m\in\Mo{S}{T}$,
+ \item for every declaration $m:S\to T=\{\cdot\}$, we have $m\in\Mo{S}{T}$,
  \item for every $T\in\Thy$, we have $\id{T}\in\Mo{T}{T}$,
- \item for every $M\in\Mo{R}{S}$ and $N\in\Mo{S}{T}$, we have $M;N\in\Mo{R}{T}$.
+ \item for every $M\in\Mo{R}{S}$ and $N\in\Mo{S}{T}$, we have $M;N\in\Mo{R}{T}$ (where $M;N$ corresponds to the usual function composition).
 \end{compactitem}
 $\Thy$ and $\Mo{S}{T}$ form the category of theories and morphisms.
 \end{nomodexp}
@@ -110,8 +110,8 @@ We omit the productions and typing rules for the remaining expressions, which in
 
 \begin{example}\label{ex:thgroup}
 For the purposes of our running examples, we assume a fixed base logic that provides a simple type system.
-\lstinline|type| is the universe of types, \lstinline|A ⟶ B| is the type of functions, and lambda abstraction is written \lstinline|[x:A] t x|.
-We also use \mmt notations, which are attached to constant declarations as \lstinline|# <not>|; these are omitted from the formal grammar above because we only use them in the examples.
+\texttt{type} is the universe of types, \lstinline|A|$\rightarrow$\lstinline|B| is the type of functions, and lambda abstraction is written \lstinline|[x:A] t x|.
+We also use \mmt notations, which are attached to constant declarations as \lstinline|# <notation>|; these are omitted from the formal grammar above because we only use them in the examples.
 
 Then the (flat) theories $\cn{Group}$ and $\cn{DivGroup}$ from the introduction are:
 \begin{mmtcode}
@@ -248,7 +248,9 @@ Further cases arise when we add structuring declarations.
 \begin{definition}[Flattening]
 For the base case, of a theory $t=\{\Sigma\}$, we define $\flt{t}$ by induction on the declarations in $\Sigma$:
 \[\flt{t}=\flt{\Sigma} \tb\mwhere\tb \flt{\cdot}=\es \tb\mand\tb
- \flt{(\Sigma,D)}=\flt{\Sigma}\cup\fltd{\flt{\Sigma}}{D}\]
+ \flt{(\Sigma,D)}=\flt{\Sigma}\cup\fltd{\flt{\Sigma}}{D},\]
+ where $\cdot$ denotes the empty sequence.
+ 
 Here $\fltd{T}{D}$ is the flattening of declaration $D$ relative to $\flt{\Sigma}$.
 At this point, we only have one case for declarations $D$, namely constant declarations.
 Their flattening is trivial:
@@ -267,19 +269,19 @@ Note that in both cases, we only have to consider constants without definiens.
 \end{definition}
 
 \begin{example}[Includes (continued from Ex.~\ref{syn:incl})]\label{sem:incl}
-Includes add new declarations $D$, so we have to add cases to the definition of $\fltd{\Sigma}{D}$.
+The $\keyword{include}$ operator adds new declarations $D$ to a theory, so we have to add cases to the definition of $\fltd{\Sigma}{D}$.
 We do this as follows
   \[\fltd{\Sigma}{(\icl{S})} = \flt{S}\]
 This has the effect of copying over all declarations from the included into the including theory.
 
-Note that the definition of $\fltd{\Sigma}{n:E=e}$ qualifies the constant name $n$ with the theory name $t$ to form the identifier $t?n$ in the flattening.
+Note that the definition of $\fltd{\Sigma}{(n:E=e)}$ qualifies the constant name $n$ with the theory name $t$ to form the identifier $t?n$ in the flattening.
 Therefore, includes can never lead to name clashes.
-Also note, that because $\flt{S}$ is a \textit{set} of declarations, the include relation is transitive: if $t$ includes $s$ via two different paths, $\flt{t}$ only contains one copy of the declarations of $\flt{s}$.
+Also note that, because $\flt{S}$ is a \textit{set} of declarations, the include relation is transitive: if $t$ includes $s$ via two different paths, $\flt{t}$ only contains one copy of the declarations of $\flt{s}$.
 
-The situation is slightly more complicated for morphisms: if a morphism out of $t$ includes two different morphisms out of $s$, these have to agree.
+The situation is slightly more complicated for morphisms: if a morphism $\sigma$ out of $t$ includes two different morphisms out of $s$, these have to agree.
 Therefore, flattening is not always defined:
   \[\fltd{\sigma}{(\icl{M})} = \flt{M}\]
-and $\sigma,\icl{M}$ is well-formed $\flt{M}$ agrees with $\flt{\sigma}$ on any constant that is in the domain of both.
+if $\sigma,\icl{M}$ is well-formed and $\flt{M}$ agrees with $\flt{\sigma}$ on any constant that is in the domain of both.
 \end{example}
 
 \begin{example}[Continuing Ex.~\ref{syn:incl}]

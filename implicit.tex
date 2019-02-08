@@ -1,6 +1,6 @@
 \subsection{Overview}
 
-Our key idea is to use a commutative subdiagram of the \mmt diagram, which we call the \emph{implicit-diagram}.
+Our key idea is to use a commutative subdiagram of the \mmt diagram, which we call the \emph{implicit diagram}.
 It contains all theories but only some of the morphisms --- the ones designated as \emph{implicit}.
 Because the implicit-diagram commutes, there can be at most one implicit morphism from $S$ to $T$ --- if this morphism is $i$, we write $\ipc{i}{S}{T}$.
 %Practically, this hasis a multi-graph whose nodes are the theories and whose edges are the atomic morphisms.
@@ -63,7 +63,7 @@ We define the set $\IMo{S}{T}\sq\Mo{S}{T}$ of \textbf{implicit} morphisms to con
  \item all morphisms that additional language features designate as implicit based on the use of additional attributes.
 \end{itemize}
 
-Adding an attribute to a declaration is only well-formed if there is (up to equality of morphisms) at most one implicit morphism for any pair of theories.
+Adding an $\keyword{implicit}$ attribute to a declaration is well-formed only if there is (up to equality of morphisms) at most one implicit morphism for any pair of theories.
 \end{definition}
 
 \begin{modexp}
@@ -85,15 +85,17 @@ In other words, the implicit morphisms form commutative diagram.
 \end{modexp}
 
 \begin{example}[Includes (continued from Ex.~\ref{sem:incl})]\label{impl:incl}
-For include morphisms, we add the following definition: if theory $T$ contains the declaration $\icl{S}$, then the induced morphism from $S$ to $T$ is implicit.
+For include morphisms, we add the following definition: if a theory $T$ contains the declaration $\icl{S}$, then the induced morphism from $S$ to $T$ is implicit.
 
 Combined with composition morphisms, we see that all transitive includes between theories are implicit.
-That corresponds to the intuition that anything that is included is available by its original name.
+That corresponds to the intuition that anything that is included is available by its original (i.e. qualified) name.
 \end{example}
 
 \begin{example}
 	For our morphism $\cn{DG2G}$ from Ex.~\ref{ex:dg2gimplicit}, this means that all symbols declared in the theory $\cn{DivGroup}$ (see Ex.~\ref{ex:thgroup}) are now visible in the theory $\cn{Group}$ with the definitions provided by $\cn{DG2G}$.
 	For example, we can write $a/b$ in $\cn{Group}$, where $/$ refers to the identifier $\cn{DivGroup}?\cn{div}$.
+	
+	(Note that notations are carried over by implicit morphisms as well)
 \end{example}
 
 \begin{union}
@@ -146,7 +148,7 @@ This is a technical trick to subsume the original rule: if $c$ is already declar
 The following theorem is our central theoretical result.
 It shows that the modification made in Def.~\ref{def:useimpl} has the intended properties:
 \begin{theorem}[Conservativity of Implicit Morphisms]
-For well-formed diagrams and $S,T\in\Thy$ and $M\in\Mo{S}{T}$:
+For well-formed diagrams and $S,T\in\Thy$ and $M\in\IMo{S}{T}$:
 \begin{compactenum}
  \item Whenever the original system proves $\vdash_T e=e':E$, so does the modified one.
  \item Whenever the modified system proves $\vdash_T e=e':E$, then the original system proves $\vdash_T \ov{e}=\ov{e'}:\ov{E}$.
@@ -176,7 +178,7 @@ We distinguish two cases:
    Now applying the induction hypothesis to the well-formedness derivation of $E$ yields $\vdash_T c:\ov{E}$ as needed.
  \item $M(c)\neq c$, i.e., $e$ is present or $M$ assigns a non-trivial value to $c$.
   Definition expansion eliminates $c$ in favor of $M(c)$, and thus $\ov{c}=\ov{M(c)}$.
-  We only have to show that $\vdash_T \ov{M(c)}:\ov{M(E)}$ That follows from the judgment preservation of morphisms.
+  We only have to show that $\vdash_T \ov{M(c)}:\ov{M(E)}$. That follows from the judgment preservation of morphisms.
 \end{compactitem}
 \end{proof}
 

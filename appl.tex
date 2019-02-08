@@ -13,7 +13,7 @@ Moreover, making a pair of isomorphisms implicit is well-formed if there are no 
 We say that a named morphism $r:S\to T=\{\ldots\}$ is a \textbf{renaming} if
 \begin{compactitem}
  \item all assignments in its body are of the form $c:=c'$ for $T$-constants $c'$ without definiens
- \item every such $T$-constants $c'$ occurs in exactly one assignment.
+ \item every  $T$-constant $c'$ without definiens occurs in exactly one assignment.
 \end{compactitem}
 Clearly, every renaming is an isomorphism.
 The inverse morphisms contains the flipped assignments $c':=c$.
@@ -21,7 +21,7 @@ The inverse morphisms contains the flipped assignments $c':=c$.
 We make the following extension to syntax and semantics:
 \begin{compactitem}
   \item A morphism declaration $r:s\to t=\{\ldots\}$ may carry the attribute \keyword{renaming}.
-  \item This is allowed if there are no implicit morphism between $s$ and $t$ yet.
+  \item This is allowed if there are no implicit morphisms between $s$ and $t$ yet.
   \item In that case, we define $r\in\IMo{s}{t}$ and $r^{-1}\in\Mo{t}{s}$.
 \end{compactitem}
 
@@ -43,17 +43,17 @@ renaming MonoidRen : Monoid2 -> Monoid =
 \end{example}
 
 \paragraph{Definitional Extensions}
-We say that the named theory $T$ is a \textbf{definitional extension} of $S$ if $T=S$ or the body of $T$ contains
+We say that the named theory $T$ is a \textbf{definitional extension} of $S$ if $T=S$ or the body of $T$ contains only
 \begin{compactitem}
- \item only constant declarations with definiens,
- \item only include declarations of theories that are definitional extensions of $S$.
+ \item constant declarations with definiens, and
+ \item include declarations of theories that are definitional extensions of $S$.
 \end{compactitem}
 
-If $T$ is a definitional extension of $S$, it is easy to prove that $t$ and $S$ are isomorphic: both isomorphisms map all constants without definiens to themselves. In particular, the isomorphism $S\to T$ maps $S$-constants to themselves and expands the definiens of all other constants.
+If $T$ is a definitional extension of $S$, it is easy to prove that $T$ and $S$ are isomorphic: both isomorphisms map all constants without definiens to themselves. In particular, the isomorphism $T\to S$ maps $S$-constants to themselves and expands the definiens of all other constants.
 
 We make the following extension to syntax and semantics:
 \begin{compactitem}
-  \item An include declaration $\icl{S}$ of a named theory $S$ inside theory $T$ may carry the attribute \keyword{definitional}.
+  \item An include declaration $\icl{S}$ of a named theory $S$ inside a theory $T$ may carry the attribute \keyword{definitional}.
   \item In that case, we define $\id{S}\in\IMo{T}{S}$ (in addition to the implicit morphism $\id{T}\in\IMo{S}{T}$ that is induced by the inclusion).
 \end{compactitem}
 
@@ -73,7 +73,7 @@ But we cannot make the retractions implicit morphisms in general because they ar
 \end{remark}
 
 \paragraph{Canonical Isomorphisms}
-If we have isomorphisms $m:s\to t$ and $n:t\to s$, we simply spell them out in morphism declarations and add the keyword \keyword{implicit} to both.
+If we have isomorphisms $m:S\to T$ and $n:T\to S$, we simply spell them out in morphism declarations and add the keyword \keyword{implicit} to both.
 This requires no language extensions.
 
 \begin{example}\label{group:iso}
@@ -121,7 +121,7 @@ MEq   & \keyword{equal} M=M:T\to T \keyword{by} \{\rep{Ass}\} &\\
 %Technically, this must be a binary logical relation in the sense of \cite{RS:logrels:12} on $\id{T}$.
 %As described in \cite{RS:logrels:12}, this induces an equality predicate $\cn{Equal}_E:E\to E\to \type$ on every type $E$.
 
-We define the declaration $M=N:S\to T \keyword{by} \{\sigma\}$ to be well-formed iff
+We define the declaration $\keyword{equal} M=N:S\to T \keyword{by} \{\sigma\}$ to be well-formed iff
 \begin{compactitem} 
   \item $M:S\to T$ and $N:S\to T$ are well-formed morphisms
   \item $\sigma$ contains exactly one assignment $c:=p$ for every $(c:E)\in\flt{S}$
@@ -146,11 +146,11 @@ So we use the new attribute \keyword{implicit-later}, which states that a morphi
 \subsection{Transparent Refactoring}
 
 A major drawback of using modular theories is that it can preclude transparent refactoring.
-For example, consider a theory $t=\{\icl{r},\icl{s}\}$, and assume we want to move a constant declaration $D$ for the name $n$ from $r$ to $s$.
-This change to should be straightforward as it does not change the semantics of $t$.
+For example, consider a theory $t=\{\icl{r},\icl{s}\}$, and assume we want to move a constant declaration $D$ for the name $n$ from $s$ to $r$.
+This change should be straightforward as it does not change the semantics of $t$.
 
 However, this is not a local change.
-It also requires updating every qualified reference from $r?n$ to $s?n$.
+It also requires updating every qualified reference from $s?n$ to $r?n$.
 Even if the source files always use the unqualified reference $n$ (because the checker is smart enough to dynamically disambiguate them), this still requires a global rebuild to reach a consistent state again.
 But such references can occur anywhere where $t$ is used, and that may include files that the person who does the refactoring does not know or does not have access to.
 

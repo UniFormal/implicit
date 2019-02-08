@@ -2,7 +2,7 @@
 Theory morphisms have proved an essential tool for managing collections of theories in logics and related formal systems.
 They can be used to structure theories and build large theories modularly from small components or to relate different theories to each other \cite{asl,devgraphs,littletheories}.
 Areas in which tools based on theories and theory morphisms have been developed include specification \cite{obj,hets}, rewriting \cite{maude}, theorem proving \cite{imps,isabelle_locales}, and knowledge representation \cite{RK:mmt:10}.
-Closely related concepts are used in both object-oriented (\emph{classes}) and (\emph{type classes}) functional programming languages.
+Closely related concepts are used in both object-oriented (\emph{classes}) and functional (\emph{type classes}) programming languages.
 
 %The latter of these tools is our \mmt system.
 %We use \mmt as both a theoretical framework and a concrete implementation of our results.
@@ -25,11 +25,11 @@ These systems usually use a logic $L$ for the low-level formalization of domain 
 
 For example, a document might reference an existing theory $\cn{Monoid}$, define a new theory $\cn{Group}$ that extends $\cn{Monoid}$, define a theory $\cn{DivGroup}$ (providing an alternative formulation of groups based on the division operation), and then define two theory morphisms $\cn{G2DG}:\cn{Group}\darr \cn{DivGroup}:\cn{DG2G}$ that witness an isomorphism between these theories.
 This would result in the diagram on the right.%
-\footnote{Note that we use the syntactic direction for the arrows, e.g., an arrow $m:S\to T$ states that any $S$-expression $E$ (e.g., a sort, term, formula, or proof) can be translated to an $T$-expression $m(E)$. Models are translated in the opposite direction.}
+\footnote{Note that we use the syntactic direction for the arrows, e.g., an arrow $m:S\to T$ states that any $S$-expression $E$ (e.g., a sort, term, formula, or proof) can be translated to a $T$-expression $m(E)$. Models are translated in the opposite direction.}
 %Crucially, $m(-)$ preserves typing and provability.
 
 The key idea behind implicit morphisms is very simple:
-We maintain an additional diagram $I$, which is commutative subdiagram of $D$ and whose morphisms we call \emph{implicit}.
+We maintain an additional diagram $I$, which is a commutative subdiagram of $D$ and whose morphisms we call \emph{implicit}.
 The condition of commutativity guarantees that $I$ has at most one morphism $i$ from theory $S$ to theory $T$, in which case we write $\ipc{i}{S}{T}$.
 Commutativity makes the following language extension well-defined: if $\ipc{i}{S}{T}$, then any identifier $c$ that is visible to $S$ may also be used in $T$-expressions, with the semantics being that $c$ abbreviates $i(c)$.
 For example, in the diagram above, we may choose to label \cn{DG2G} implicit.
@@ -39,7 +39,7 @@ While these morphisms must be labeled manually, any inclusion morphism like the 
 
 \paragraph{Contribution}
 At the highest level, our contribution is the observation that implicit morphisms form a sweet spot of a very simple language feature that has substantial practical uses.
-We recommend using implicit morphisms in all theory morphism--based formalisms.
+We recommend using implicit morphisms in all theory--morphism--based formalisms.
 More concretely, we present a formal system for developing structured theories with implicit morphisms.
 Our starting point is the \mmt language \cite{RK:mmt:10}, which already provides a very general setting for defining and working with theories and morphisms.
 \mmt is logic-independent, i.e., allows embedding a large variety of declarative languages (logics, type-theories, etc.).
