@@ -17,8 +17,16 @@ Consequently, many of the advantages of inclusions carry over to implicit morphi
 \item It is very easy to maintain the implicit-diagram, e.g., as a partial map that assigns to a pair of theories the implicit morphism between them (if any).
 \item We can generalize the visibility of identifiers: If $\ipc{i}{S}{T}$, we can use all $S$-identifiers in $T$ as if $S$ were included into $T$.
 Any $c\in\dom{S}$ is treated as a valid $T$-identifiers with definiens $M(c)$.
-\item We can use canonical identifiers $S?n$ without worrying about ambiguity. Because there can be at most one implicit morphism $\ipc{i}{S}{T}$, using $S?n$ as an identifier in $T$ is unambiguous.
+\item We can use canonical identifiers $S?n$ without worrying about ambiguity.
+Because there can be at most one implicit morphism $\ipc{i}{S}{T}$, using $S?n$ as an identifier in $T$ is unambiguous.
 %Crucially, we can use $S?n$ without bothering what $i$ is.
+\end{compactitem}
+
+In practice, the \mmt system searches for an implicit morphism $\ipc{i}{S}{T}$ whenever needed to make an expression well-formed, e.g.,
+\begin{compactitem}
+ \item An $S$-constant $c$ is used in $T$: treat $c$ as an abbreviation for $i(c)$.
+ \item A model $M$ of $T$ is used even though a model of $S$ is expected: reduce $M$ via $i$.
+ \item A morphism $M:R\to S$ is composed with a morphism $M':T\to U$: treat $M;M'$ like $M;i;M'$.
 \end{compactitem}
 
 %Thus the main question arises what other morphisms we should make implicit.
@@ -56,6 +64,7 @@ The first change governs how we obtain implicit morphisms, the second one how we
 We define the set $\IMo{S}{T}\sq\Mo{S}{T}$ of \textbf{implicit} morphisms to contain the following elements:
 \begin{itemize}
  \item all declared morphisms $m:S\to T=\{\sigma\}$ whose declaration carries the attribute $\keyword{implicit}$,
+ \item if $t$ has meta-theory $L$, the identity map as an implicit morphism $L\to t$,
 \begin{nomodexp}
  \item all identity morphisms $\id{T}$,
  \item all compositions $M;N$ of implicit morphisms $M$ and $N$,
@@ -181,6 +190,17 @@ We distinguish two cases:
   We only have to show that $\vdash_T \ov{M(c)}:\ov{M(E)}$. That follows from the judgment preservation of morphisms.
 \end{compactitem}
 \end{proof}
+
+
+With implicit morphisms, we can also relax the semantics of many structuring features:
+
+\begin{example}[Includes and Meta-Theories (continued from Ex.~\ref{sem:incl})]\label{impl:incl2}
+Consider $t:L=\{\ldots,\icl{S},\ldots\}$ where $S$ has meta-theory $L'$.
+Instead of requiring $L'\harr L$ as in Ex.~\ref{sem:incl}, we require only $\ipc{i}{L'}{L}$.
+
+In that case, we treat $\icl{S}$ as an abbreviation for $\icl{i(S)}$, where $i(S)$ is the pushout of $S$ along $i$ (see \cite{rabe:howto} for details on \mmt pushouts).
+If $L'\harr L$, this reduces to the original semantics.
+\end{example}
 
 %\subsection{Commutativity}\label{sec:commute}
 %

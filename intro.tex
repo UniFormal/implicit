@@ -39,13 +39,29 @@ While these morphisms must be labeled manually, any inclusion morphism like the 
 
 \paragraph{Contribution}
 At the highest level, our contribution is the observation that implicit morphisms form a sweet spot of a very simple language feature that has substantial practical uses.
-We recommend using implicit morphisms in all theory--morphism--based formalisms.
+We recommend using implicit morphisms in all theory morphism--based formalisms.
 More concretely, we present a formal system for developing structured theories with implicit morphisms.
 Our starting point is the \mmt language \cite{RK:mmt:10}, which already provides a very general setting for defining and working with theories and morphisms.
 \mmt is logic-independent, i.e., allows embedding a large variety of declarative languages (logics, type-theories, etc.).
 Therefore, all our results can be directly applied to any language $L$ represented in \mmt or easily transferred to dedicated implementations of $L$.
 
-We describe several example applications of implicit morphisms in detail: the identification of isomorphic theories, definitional extensions of theories, building large hierarchies of theories with many rarely used intermediate theories, and transparently refactoring theory hierarchies.
+We describe several example applications of implicit morphisms in detail: the identification of isomorphic theories, definitional extensions of theories, building large hierarchies of theories with many rarely used intermediate theories, seamlessly moving theories across logic morphisms, and transparently refactoring theory hierarchies.
+
+\paragraph{Previous Work}
+Implicit morphism were first conceived by Rabe in 2010 and implemented as part of the Twelf system \cite{twelf} (which implements the dependent type theory LF).
+The theory behind this implementation was never written up and not published.
+But the implementation already scaled well, and implicit morphisms were used in the LATIN logic atlas \cite{CHKMR:latinabs} built by Rabe and others in 2009--2012.
+The LATIN atlas already has around a 1000 theories and atomic morphisms, and about 50 of the latter are marked as implicit.
+It also has a few hundred inclusions, each of which induces another implicit morphism.
+
+Since then, MMT has been developed, and
+\begin{compactitem}
+ \item implicit morphisms were generalized from LF to the logic-independent level of MMT,
+ \item their theory was worked out,
+ \item they were reimplemented from scratch as a part of MMT.
+\end{compactitem}
+MMT is backwards-compatible with Twelf, and the LATIN atlas including its implicit morphisms can be used from within MMT.
+The present paper introduces these results in their final, most elegant form.
 
 \paragraph{Overview}
 In Sect.~\ref{sec:mmt}, we present the syntax and semantics of \mmt.

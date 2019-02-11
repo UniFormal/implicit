@@ -1,0 +1,179 @@
+Updated response
+
+Below we describe how we worked in all major comments.
+We have worked in all minor comments as well.
+
+---------------------------------------------
+Comment 1 (Review 1):
+  presentation is MMT-specific, unclear what to do with it
+  no global vision of what to do with those ingredients and how the proposed concept can help
+
+Comment 2 (Review 1):
+  just a bigger example with a dozen theories and information about the advantages provided by implicit morphisms in this setting would be helpful to evaluate its importance
+
+Comment 3 (Review 2) (see also Comment 5):
+  the formal theory supporting implicit morphisms is very simple
+  only major result of the paper, theorem 1, follows almost immediately, and the paper's contribution reduces to definitions
+
+
+Response:
+
+It helps to know the following.
+Implicit morphism were first conceived by Rabe in 2010 and implemented as part of the Twelf system (which implements the dependent type theory LF).
+The theory behind this implementation was never written up and therefore not published.
+
+But the implementation already scaled well, and implicit morphisms were used in the LATIN logic atlas build by Rabe et al. in ~2009-2012.
+The LATIN atlas already has around a 1000 theories and atomic morphisms, and about 50 of the latter are marked as implicit.
+It also has a few hundred inclusions, each of which induces another implicit morphism.
+
+In the following years, MMT was developed. As part of this development
+- implicit morphisms were generalized from LF to the logic-independent level of MMT,
+- their theory was worked out and written up,
+- they were reimplemented from scratch as a part of MMT.
+MMT is backwards-compatible with Twelf, and the LATIN atlas including its implicit morphisms can be used from within MMT.
+
+The present paper was written as the climax of this development to coincide with the first MMT release in which implicit morphisms are officially supported.
+
+The simplicity (Comment 3) is the result of improving syntax, semantics, and implementation for 8 years until we found the simplest possible formulation.
+We think of our result as a language design result and of that simplicity as our main achievemnt.
+But note that our response to Comment 5 will deepen the results of our paper.
+
+The lack of big picture description (Comment 1) and larger case study (Comment 2) are the result of us focusing on the technical details and keeping the preliminaries and background minimal.
+We believe now that was a mistake.
+
+We believe we have remedied all three comments by adding the above text in a new paragraph in the introduction.
+We have also increased the size of the example in Sect. 4.2 and 4.3.
+
+---------------------------------------------
+Comment 4 (Review 2):
+  the hand-waving style led to mistakes or slight inconsistencies (see my comments below)
+
+Response:
+
+We have taken care of inconsistencies and work in all minor comments.
+We expect that has naturally eliminated the hand-waving. 
+
+---------------------------------------------
+Comment 5 (Review 2):
+I would have liked to see more discussion on how their theory applies in other settings than MMT, in particular for a diagram of heterogeneous theories (e.g. over a Grothendieck institution).
+My guess is that the transfer of results is not that immediate, for example you would need some mechanism for proofs.
+
+Response:
+
+MMT treats logics as theories and logic translations as theory morphisms (which in particular must translate any proof rules delared in the domain logic to proofs in the target logic).
+Thus, morphisms between theories and logics are treated uniformly by MMT, and in particular logic morphisms can be implicit in the same way.
+Indeed, several logic morphisms (e.g., PL -> FOL -> HOL etc.) are natural candidates for marking as implicit morphisms.
+
+The description of logics and logic morphisms was originally omitted from the paper to make the theory simpler.
+In light of Comment 3 and 5, we have added this description to Sect. 2 (which required a few small changes, which can be found by searching for "meta").
+We have added a bigger example in Sect. 4.2 and describe in the new Sect. 4.3 how to build it as a diagram of heterogeneous theories. 
+
+---------------------------------------------
+Noteworthy minor comments from Review 2:
+
+--------
+page 6, def. 4:
+This seems faulty. Consider the example of Group, without inclusions.
+Via flattening, you get
+Group?U : type
+Group?op : U -> U -> U
+because with your definition (n : E)^\flat = t?n : E
+I would expect to get
+Group?op : Group?U -> Group?U -> Group?U
+This must also be taken care of for imports.
+
+Response:
+The presentation in the paper is slightly confusing because "U" is concrete syntax, which is parsed in "Group?U" in abstract syntax.
+We have added Rem. 1 to clarify that.
+
+--------
+page 10, renamings:
+when using the attribute renaming, are the conditions of the
+definition checked?
+
+Response:
+Yes.
+
+--------
+page 12:
+instead of introducing "implicit-later", would it not be better to
+have a mechanism for deriving that the morphism is implicit
+(e.g. because the isomorphism proof exists)?
+
+Response:
+In general, not every isomorphism can automatically be implicit because there may be multiple different isomorphisms between the same theories.
+However, in this particular case, the system could indeed infer that G2DG is the inverse of an implicit isomorphism and therefore should be implicit as well.
+We rephrased the example accordingly.
+
+---------------------------------------------
+Comment 6 (Review 3):
+  not convinced of the practical benefits of this particular implementation, and tend to consider that most of them can also be achieved (as per Section 4 of the paper), with minimal or no additional effort, using ordinary theory morphisms
+  would gladly accept a counterargument
+
+Response:
+We agree that the effect can be achieved with minimal additional effort.
+But we hold that implicit morphisms, which are ordinary theory morphisms with an additional boolean flag, are already the simplest possible way to do it, and we've spent years finding whittling down the ideas to the simplest possible solution.
+(See also our response to Comment 1-3.) 
+
+This comment had 3 sub-comments, to which we respond below.
+We believe that these responses constitute a strong counterargument.
+
+------------
+Comment 6.1: In regard to 'Identifying theories via implicit isomorphisms'
+
+Response:
+The reviewer is right with one exception: The main advantage of implicit morphisms m:A -> B is that m is later on inserted automatically without the user having to refer to m every time.
+That is only possible if the user manually clarifies which morphisms should be implicit because there could be more than one isomorphism A -> B.
+
+See also the response to Comment 6.2.
+
+------------
+Comment 6.2: In regard to 'Fine-granular and flexible theory hierarchies'
+
+Response:
+The well-formedness property of implicit morphisms is the same as for ordinary morphisms.
+In particular, nothing special happens when the user makes the morphism CancellationMonoid -> Group implicit (except for checking that there is no implicit morphism of that type yet).
+
+All the advantage come later when Group is used:
+
+* A later theory that includes Group can directly refer to all identifiers from CancellationMonoid.
+  MMT even lists these identifiers automatically in the auto-completion dialog, and the MMT parser automatically uses their notations.
+  Thus, users can simply include Group as if it includes CancellationMonoid without having to know the details of the library strucutre.
+  
+* Any parameter of type CancellationMonoid can be substituted with an instance of Group.
+  Similarly, any morphism into CancellationMonoid can be composed with a morphism out of Group. 
+  In both cases, MMT automatically inserts the implicit moprhism.
+
+Overall, this yields a big advantage when releasing a large library because users can work more intuitively without having to learn the library structure in detail (e.g., a user can use Group like a CancellationMonoid without worrying about the conversion).
+
+We have added a paragraph at the end of Sect. 3.1 to emphasize these advantages.
+Moreover, we have revised 4.2 to strengthen the motivation and use a larger example.
+
+Regarding the question about inclusions:
+Because inclusions are implicit by default, the commutativity requirement already ensures that an implicit morphism A -> B must be the identity on all theories that are included into both A and B.
+
+------------
+Comment 6.3: In regard to 'Transparent refactoring'
+
+Response:
+The reviewer is right.
+A smarter way to do the refactoring example is to leave s as it is and introduce a second implicit morphism s' -> s.
+We have changed the example accordingly.
+
+The reviewer is also right that external refactoring mechanisms should also be used.
+But when managing releases of big libraries, it is often desirable to ensure backwards compatibility without requiring users to run a refactoring propragation tool.
+A typical application would be to deprecate the original theories but use implicit morphisms to ensure that they still work.
+Then after a transition period the original theories are removed from the library and users are expected to switch to the new, cleaner and more orderly diagram.
+
+We have added some sentences on that.
+
+---------------------------------------------
+Comment 7 (Review 3):
+  discussion on the potential uses of implicit morphisms outside the scope of MMT
+  connection with other generalisations of the set-theoretic notion of inclusion, e.g., factorisation or inclusion systems).
+  
+Response:
+We have no results in this direction yet.
+We thought of factorization and inclusion systems but did not mention them because we had no results about how they relate to implicit morphisms.
+We'd be happy to receive ideas on this issue.
+We added a sentence on that under future work.
