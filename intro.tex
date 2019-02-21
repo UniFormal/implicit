@@ -40,10 +40,9 @@ While these morphisms must be labeled manually, any inclusion morphism like the 
 \paragraph{Contribution}
 At the highest level, our contribution is the observation that implicit morphisms form a sweet spot of a very simple language feature that has substantial practical uses.
 We recommend using implicit morphisms in all theory morphism--based formalisms.
-More concretely, we present a formal system for developing structured theories with implicit morphisms.
-Our starting point is the \mmt language \cite{RK:mmt:10}, which already provides a very general setting for defining and working with theories and morphisms.
-\mmt is logic-independent, i.e., allows embedding a large variety of declarative languages (logics, type-theories, etc.).
-Therefore, all our results can be directly applied to any language $L$ represented in \mmt or easily transferred to dedicated implementations of $L$.
+More concretely, we present a formal system for developing structured theories with implicit morphisms based on the \mmt language \cite{RK:mmt:10}.
+We choose \mmt because it provides a simple framework for working with theories and morphisms while remaining logic-independent: \mmt allows embedding a large variety of declarative languages $L$ (logics, type-theories, etc.) so that our results immediately yield an implementation of implicit morphisms for any such $L$.
+We also expect but do not describe here that other morphism-based systems can be easily extended to allow for implicit morphisms.
 
 We describe several example applications of implicit morphisms in detail: the identification of isomorphic theories, definitional extensions of theories, building large hierarchies of theories with many rarely used intermediate theories, seamlessly moving theories across logic morphisms, and transparently refactoring theory hierarchies.
 
